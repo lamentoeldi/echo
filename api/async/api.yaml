@@ -1,0 +1,158 @@
+asyncapi: 2.6.0
+info:
+  title: Echo
+  version: 0.1.0
+channels:
+  audio_raw:
+    description: This topic contains unprocessed audio meta
+    subscribe:
+      message:
+        $ref: '#/components/messages/AudioRaw'
+    publish:
+      message:
+        $ref: '#/components/messages/AudioRaw'
+  audio_preprocessed:
+    description: This topic contains preprocessed audio meta
+    subscribe:
+      message:
+        $ref: '#/components/messages/AudioPreprocessed'
+    publish:
+      message:
+        $ref: '#/components/messages/AudioPreprocessed'
+  audio_transcribed:
+    description: This topic contains transcribed audio
+    subscribe:
+      message:
+        $ref: '#/components/messages/AudioTranscribed'
+    publish:
+      message:
+        $ref: '#/components/messages/AudioTranscribed'
+
+components:
+  messages:
+    AudioRaw:
+      name: AudioRaw
+      payload:
+        $ref: '#/components/schemas/AudioRaw'
+    AudioPreprocessed:
+      name: AudioPreprocessed
+      payload:
+        $ref: '#/components/schemas/AudioPreprocessed'
+    AudioTranscribed:
+      name: AudioTranscribed
+      payload:
+        $ref: '#/components/schemas/AudioTranscribed'
+
+  schemas:
+    AudioRaw:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Message UUID
+        user_id:
+          type: string
+          description: User ID
+        duration:
+          type: integer
+          description: Duration of audio in milliseconds
+        size:
+          type: integer
+          description: Size of audio in bytes
+        format:
+          type: string
+          description: Audio format
+        sample_rate:
+          type: integer
+          description: Audio sample rate
+        channels:
+          type: integer
+          description: Audio channels (mono = 1, stereo = 2)
+        source:
+          type: string
+          description: Source of audio (telegram bot, web api, etc)
+        timestamp:
+          type: integer
+          description: Audio timestamp in UNIX nano format
+      required:
+        - id
+        - user_id
+        - format
+        - source
+      example:
+        id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        user_id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        duration: 4300
+        size: 23014
+        format: "ogg"
+        sample_rate: 48000
+        source: "telegram"
+        timestamp: 1720780001234567890
+    AudioPreprocessed:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Message UUID
+        user_id:
+          type: string
+          description: User ID
+        duration:
+          type: integer
+          description: Duration of audio in milliseconds
+        size:
+          type: integer
+          description: Size of audio in bytes
+        channels:
+          type: integer
+          description: Audio channels (mono = 1, stereo = 2)
+        source:
+          type: string
+          description: Source of audio (telegram bot, web api, etc)
+        timestamp:
+          type: integer
+          description: Audio timestamp in UNIX nano format
+      required:
+        - id
+        - user_id
+        - format
+        - source
+      example:
+        id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        user_id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        duration: 4300
+        size: 23014
+        source: "telegram"
+        timestamp: 1720780001234567890
+    AudioTranscribed:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Message UUID
+        user_id:
+          type: string
+          description: User ID
+        transcription:
+          type: string
+          description: Audio transcription
+        size:
+          type: integer
+          description: Size of audio in bytes
+        source:
+          type: string
+          description: Source of audio (telegram bot, web api, etc)
+        timestamp:
+          type: integer
+          description: Audio timestamp in UNIX nano format
+      required:
+        - id
+        - user_id
+        - transcription
+        - source
+      example:
+        id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        user_id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        transcription: "Some transcribed text"
+        source: "telegram"
+        timestamp: 1720780001234567890
