@@ -19,29 +19,50 @@ channels:
     publish:
       message:
         $ref: '#/components/messages/AudioPreprocessed'
-  audio_transcribed:
-    description: This topic contains transcribed audio
+  audio_transcribed_tg:
+    description: This topic contains transcribed audio for Telegram bot
     subscribe:
       message:
-        $ref: '#/components/messages/AudioTranscribed'
+        $ref: '#/components/messages/AudioTranscribedTg'
     publish:
       message:
-        $ref: '#/components/messages/AudioTranscribed'
+        $ref: '#/components/messages/AudioTranscribedTg'
 
 components:
   messages:
     AudioRaw:
-      name: AudioRaw
+      name: audio_raw
+      title: Raw audio metadata
+      contentType: application/json
       payload:
-        $ref: '#/components/schemas/AudioRaw'
+        type: object
+        properties:
+          meta:
+            $ref: '#/components/schemas/MessageMeta'
+          content:
+            $ref: '#/components/schemas/AudioRaw'
     AudioPreprocessed:
-      name: AudioPreprocessed
+      name: audio_preprocessed
+      title: Preprocessed audio metadata
+      contentType: application/json
       payload:
-        $ref: '#/components/schemas/AudioPreprocessed'
-    AudioTranscribed:
-      name: AudioTranscribed
+        type: object
+        properties:
+          meta:
+            $ref: '#/components/schemas/MessageMeta'
+          content:
+            $ref: '#/components/schemas/AudioPreprocessed'
+    AudioTranscribedTg:
+      name: audio_transcribed_tg
+      title: Transcribed audio metadata
+      contentType: application/json
       payload:
-        $ref: '#/components/schemas/AudioTranscribed'
+        type: object
+        properties:
+          meta:
+            $ref: '#/components/schemas/MessageMeta'
+          content:
+            $ref: '#/components/schemas/AudioTranscribed'
 
   schemas:
     AudioRaw:
@@ -61,15 +82,18 @@ components:
           description: Size of audio in bytes
         format:
           type: string
+          enum: ["ogg", "oga"]
           description: Audio format
         sample_rate:
           type: integer
           description: Audio sample rate
         channels:
           type: integer
-          description: Audio channels (mono = 1, stereo = 2)
+          enum: [1, 2]
+          description: Audio channels
         source:
           type: string
+          enum: ["tg"]
           description: Source of audio (telegram bot, web api, etc)
         timestamp:
           type: integer
@@ -86,7 +110,8 @@ components:
         size: 23014
         format: "ogg"
         sample_rate: 48000
-        source: "telegram"
+        channels: 1
+        source: "tg"
         timestamp: 1720780001234567890
     AudioPreprocessed:
       type: object
@@ -105,9 +130,11 @@ components:
           description: Size of audio in bytes
         channels:
           type: integer
-          description: Audio channels (mono = 1, stereo = 2)
+          enum: [1, 2]
+          description: Audio channels
         source:
           type: string
+          enum: ["tg"]
           description: Source of audio (telegram bot, web api, etc)
         timestamp:
           type: integer
@@ -115,14 +142,14 @@ components:
       required:
         - id
         - user_id
-        - format
         - source
       example:
         id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         user_id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         duration: 4300
         size: 23014
-        source: "telegram"
+        channels: 1
+        source: "tg"
         timestamp: 1720780001234567890
     AudioTranscribed:
       type: object
@@ -139,9 +166,6 @@ components:
         size:
           type: integer
           description: Size of audio in bytes
-        source:
-          type: string
-          description: Source of audio (telegram bot, web api, etc)
         timestamp:
           type: integer
           description: Audio timestamp in UNIX nano format
@@ -149,10 +173,40 @@ components:
         - id
         - user_id
         - transcription
-        - source
       example:
         id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         user_id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         transcription: "Some transcribed text"
-        source: "telegram"
         timestamp: 1720780001234567890
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          enum: [ 1 ]
+          description: Error code
+        message:
+          type: string
+          description: Error message
+      required:
+        - code
+        - message
+      example:
+        code: 1
+        message: "Transcription failed due to unreadable audio"
+    MessageMeta:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["ok", "error"]
+        error:
+          $ref: '#/components/schemas/Error'
+      required:
+        - status
+      examples:
+        - status: "ok"
+        - status: "error"
+          error:
+            code: 1
+            message: "Transcription failed due to unreadable audio"
