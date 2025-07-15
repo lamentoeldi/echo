@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
-import io
+from io import BytesIO
 
 from typing_extensions import overload
 
-from classes import AudioRawMessage, User
+from classes import AudioRawMessage, User, UserUpdate
 
 
 class BotAPIPort(ABC):
@@ -21,7 +21,7 @@ class BotAPIPort(ABC):
 
 class StoragePort(ABC):
     @abstractmethod
-    async def upload_audio(self, filename: str, audio: io.BytesIO):
+    async def upload_audio(self, filename: str, audio: BytesIO):
         """
         Uploads an audio file to storage
         :param filename:
@@ -72,12 +72,34 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
+    @overload
+    async def update_user(self, tg_id: int, update: UserUpdate):
+        """
+        Updates a user from the repository by tg id
+        :param tg_id:
+        :param update:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    async def update_user(self, user_id: UUID, update: UserUpdate):
+        """
+        Updates a user from the repository by tg id
+        :param user_id:
+        :param update:
+        :return:
+        """
+        pass
+
+    @abstractmethod
     async def delete_user(self, tg_id: int) -> User:
         """
         Deletes a user from the repository by tg id
         :param tg_id:
         :return:
         """
+        pass
 
     @abstractmethod
     @overload

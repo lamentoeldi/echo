@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from uuid import UUID
+from typing import Optional
 
 
 class ProcessingError(BaseModel):
@@ -52,3 +53,8 @@ class User(BaseModel):
     tg_id: int = Field()
     tg_username: str = Field()
     language: str = Field()
+
+
+class UserUpdate(BaseModel):
+    tg_username: Optional[str] = None
+    language: Optional[str] = None
