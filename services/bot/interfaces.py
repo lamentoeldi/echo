@@ -146,7 +146,7 @@ class AbstractVoiceMessageUseCase(ABC):
         pass
 
 
-class KeyboardProvider(ABC):
+class AbstractKeyboardProvider(ABC):
     @abstractmethod
     def get_settings_keyboard(self, locale: str) -> KeyboardMarkup:
         """

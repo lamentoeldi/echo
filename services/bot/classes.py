@@ -70,7 +70,7 @@ class KeyboardButton(BaseModel):
     """
     Abstracts tg keyboard button
     """
-    text: str
+    text: str = Field()
     callback_data: Optional[str] = None
 
 
