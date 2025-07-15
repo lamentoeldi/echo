@@ -1,0 +1,306 @@
+import io
+
+from interfaces import (
+    AbstractCore,
+    AbstractStartUseCase,
+    AbstractHelpUseCase,
+    AbstractSettingsUseCase,
+    AbstractInvalidInputUseCase,
+    AbstractVoiceMessageUseCase
+)
+from ports import (
+    RepositoryPort,
+    LocalePort,
+    BotAPIPort,
+    MessageBusPort,
+    StoragePort
+)
+from config import BotConfig
+from classes import UserUpdate
+
+
+class StartUseCase(AbstractStartUseCase):
+    def __init__(
+        self,
+        config: BotConfig,
+        core: AbstractCore,
+        repo: RepositoryPort,
+        locale: LocalePort,
+        bot: BotAPIPort
+    ):
+        self.config = config
+        self.core = core
+        self.repo = repo
+        self.locale = locale
+        self.bot = bot
+
+    async def handle_start(self, tg_id: int, tg_username: str):
+        default_lang = (
+            self
+            .config
+            .default_locale
+        )
+
+        greeting = (
+            self
+            .locale
+            (default_lang)
+            ("greeting")
+        )
+
+        await (
+            self
+            .bot
+            .send_text
+            (tg_id, greeting)
+        )
+
+        user = (
+            self
+            .core
+            .create_user
+            (tg_id, tg_username, default_lang)
+        )
+
+        await (
+            self
+            .repo
+            .add_user(user)
+        )
+
+
+class HelpUseCase(AbstractHelpUseCase):
+    def __init__(
+        self,
+        repo: RepositoryPort,
+        locale: LocalePort,
+        bot: BotAPIPort
+    ):
+        self.repo = repo
+        self.locale = locale
+        self.bot = bot
+
+    async def handle_help(self, tg_id: int):
+        lang = ((
+            await
+            self
+            .repo
+            .get_user(tg_id))
+            .language
+        )
+
+        await (
+            self
+            .bot
+            .send_text(
+                tg_id, self.locale(lang)("help")
+            )
+        )
+
+
+class SettingsUseCase(AbstractSettingsUseCase):
+    def __init__(
+        self,
+        core: AbstractCore,
+        repo: RepositoryPort,
+        locale: LocalePort,
+        bot: BotAPIPort
+    ):
+        self.core = core
+        self.repo = repo
+        self.locale = locale
+        self.bot = bot
+
+    async def handle_settings(self, tg_id: int):
+        lang = ((
+            await
+            self
+            .repo
+            .get_user(tg_id))
+            .language
+        )
+
+        kb = (
+            self
+            .core
+            .get_settings_keyboard(lang)
+        )
+
+        await (
+            self
+            .bot
+            .send_text(
+                tg_id, self.locale(lang)("settings"), kb
+            )
+        )
+
+    async def change_language(self, tg_id: int):
+        lang = ((
+            await
+            self
+            .repo
+            .get_user(tg_id))
+            .language
+        )
+
+        kb = (
+            self
+            .core
+            .get_languages_keyboard()
+        )
+
+        await (
+            self
+            .bot
+            .send_text(
+                tg_id, self.locale(lang)("change_language"), kb
+            )
+        )
+
+    async def set_language(self, tg_id: int, new_lang: str):
+        lang = ((
+            await
+            self
+            .repo
+            .get_user(tg_id))
+            .language
+        )
+
+        await (
+            self
+            .bot
+            .send_text(
+                tg_id, self.locale(lang)("language_set")
+            )
+        )
+
+        upd = UserUpdate(language=new_lang)
+        await (
+            self
+            .repo
+            .update_user(tg_id, upd)
+        )
+
+
+class InvalidInputUseCase(AbstractInvalidInputUseCase):
+    def __init__(
+        self,
+        locale: LocalePort,
+        bot: BotAPIPort,
+        repo: RepositoryPort,
+    ):
+        self.locale = locale
+        self.bot = bot
+        self.repo = repo
+
+    async def handle_invalid_input(self, tg_id: int):
+        lang = ((
+            await
+            self
+            .repo
+            .get_user(tg_id))
+            .language
+        )
+
+        await (
+            self
+            .bot
+            .send_text(tg_id, self.locale(lang)("invalid_input"))
+        )
+
+
+class VoiceMessageUseCase(AbstractVoiceMessageUseCase):
+    def __init__(
+        self,
+        core: AbstractCore,
+        bot: BotAPIPort,
+        repo: RepositoryPort,
+        locale: LocalePort,
+        broker: MessageBusPort,
+        storage: StoragePort
+    ):
+        self.core = core
+        self.bot = bot
+        self.repo = repo
+        self.locale = locale
+        self.broker = broker
+        self.storage = storage
+
+    async def start_vm_handling(self, tg_id: int, audio: io.BytesIO):
+        user = await (
+            self
+            .repo
+            .get_user(tg_id)
+        )
+
+        md = (
+            self
+            .core
+            .create_audio_md(str(user.id), audio)
+        )
+
+        filename = str(md.content.id)
+
+        await (
+            self
+            .storage
+            .upload_audio(filename, audio)
+        )
+
+        await (
+            self
+            .broker
+            .publish_audio(md)
+        )
+
+        await (
+            self
+            .bot
+            .send_text(tg_id, self.locale(user.language)("vm_accepted"))
+        )
+
+    async def send_transcription(self, tg_id: int, transcription: str):
+        lang = ((
+            await
+            self
+            .repo
+            .get_user(tg_id))
+            .language
+        )
+
+        msg = (
+            self
+            .core
+            .create_audio_transcription(
+                self.locale(lang)("transcription_success"), transcription
+            )
+        )
+
+        await (
+            self
+            .bot
+            .send_text(tg_id, msg)
+        )
+
+    async def send_error_text(self, tg_id: int, error: str):
+        lang = ((
+            await
+            self
+            .repo
+            .get_user(tg_id))
+            .language
+        )
+
+        msg = (
+            self
+            .core
+            .create_error_text(
+                self.locale(lang)("transcription_error"), error
+            )
+        )
+
+        await (
+            self
+            .bot
+            .send_text(tg_id, msg)
+        )
