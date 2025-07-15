@@ -1,8 +1,68 @@
 import io
 from abc import ABC, abstractmethod
 
+from classes import User, AudioRawMessage, KeyboardMarkup
 
-class StartUseCase(ABC):
+
+class AbstractCore(ABC):
+    @abstractmethod
+    def create_user(self, tg_id: int, tg_username: str, lang: str) -> User:
+        """
+        Creates a new user
+        :param tg_id:
+        :param tg_username:
+        :param lang:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def create_audio_md(self, user_id: str, audio: io.BytesIO) -> AudioRawMessage:
+        """
+        Creates an audio md object
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def create_audio_transcription(self, locale_msg: str, transcription: str) -> str:
+        """
+        Creates an audio transcription message with markup
+        :param locale_msg:
+        :param transcription:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def create_error_text(self, locale_msg: str, error: str) -> str:
+        """
+        Creates an error text message with markup
+        :param locale_msg:
+        :param error:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def get_settings_keyboard(self, locale: str) -> KeyboardMarkup:
+        """
+        Returns the inline keyboard with available settings
+        :param locale:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def get_languages_keyboard(self) -> KeyboardMarkup:
+        """
+        Returns the reply keyboard with available languages
+        :return:
+        """
+        pass
+
+
+class AbstractStartUseCase(ABC):
     @abstractmethod
     async def handle_start(self, tg_id: int, tg_username: str):
         """
@@ -15,22 +75,21 @@ class StartUseCase(ABC):
         pass
 
 
-class HelpUseCase(ABC):
+class AbstractHelpUseCase(ABC):
     @abstractmethod
-    async def handle_help(self, tg_id: int, tg_username: str):
+    async def handle_help(self, tg_id: int):
         """
         To handle /help command
         Sends help message
         :param tg_id:
-        :param tg_username:
         :return:
         """
         pass
 
 
-class InvalidInputUseCase(ABC):
+class AbstractInvalidInputUseCase(ABC):
     @abstractmethod
-    async def handle_invalid_input(self):
+    async def handle_invalid_input(self, tg_id: int):
         """
         To handle invalid input
         Send invalid input message
@@ -39,9 +98,9 @@ class InvalidInputUseCase(ABC):
         pass
 
 
-class SettingsUseCase(ABC):
+class AbstractSettingsUseCase(ABC):
     @abstractmethod
-    async def handle_settings(self):
+    async def handle_settings(self, tg_id: int):
         """
         To handle /settings command
         Sends keyboard with bot settings
@@ -50,17 +109,27 @@ class SettingsUseCase(ABC):
         pass
 
     @abstractmethod
-    async def change_language(self, user_id: int, new_lang: str):
+    async def change_language(self, user_id: int):
         """
-        To change language
+        Initiates language change
+        Sends reply keyboard with language options
         :param user_id:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    async def set_language(self, tg_id: int, new_lang: str):
+        """
+        Sets new language
+        :param tg_id:
         :param new_lang:
         :return:
         """
         pass
 
 
-class VoiceMessageUseCase(ABC):
+class AbstractVoiceMessageUseCase(ABC):
     @abstractmethod
     async def start_vm_handling(self, user_id: int, audio: io.BytesIO):
         """

@@ -1,19 +1,26 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 from io import BytesIO
+from typing import Callable, Union
 
 from typing_extensions import overload
 
-from classes import AudioRawMessage, User, UserUpdate
+from classes import (
+    AudioRawMessage,
+    User,
+    UserUpdate,
+    KeyboardMarkup
+)
 
 
 class BotAPIPort(ABC):
     @abstractmethod
-    async def send_text(self, user_id: int, text: str):
+    async def send_text(self, user_id: int, text: str, keyboard: KeyboardMarkup = None):
         """
         Sends a text message to the user.
         :param user_id:
         :param text:
+        :param keyboard:
         :return:
         """
         pass
@@ -33,10 +40,10 @@ class StoragePort(ABC):
 
 class MessageBusPort(ABC):
     @abstractmethod
-    async def publish_audio(self, audio: AudioRawMessage):
+    async def publish_audio(self, md: AudioRawMessage):
         """
         Publishes an audio message metadata to message bus
-        :param audio:
+        :param md:
         :return:
         """
         pass
@@ -52,7 +59,6 @@ class RepositoryPort(ABC):
         """
         pass
 
-    @abstractmethod
     @overload
     async def get_user(self, tg_id: int) -> User:
         """
@@ -62,7 +68,7 @@ class RepositoryPort(ABC):
         """
         pass
 
-    @abstractmethod
+    @overload
     async def get_user(self, user_id: UUID) -> User:
         """
         Gets a user from the repository by id
@@ -72,6 +78,14 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
+    async def get_user(self, key: Union[int, UUID]) -> User:
+        """
+        Gets a user from the repository by tg id or internal id
+        :param key: tg_id or UUID
+        :return:
+        """
+        pass
+
     @overload
     async def update_user(self, tg_id: int, update: UserUpdate):
         """
@@ -82,11 +96,21 @@ class RepositoryPort(ABC):
         """
         pass
 
-    @abstractmethod
+    @overload
     async def update_user(self, user_id: UUID, update: UserUpdate):
         """
         Updates a user from the repository by tg id
         :param user_id:
+        :param update:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    async def update_user(self, key: Union[int, UUID], update: UserUpdate):
+        """
+        Updates a user from the repository by tg id or internal id
+        :param key: tg_id or UUID
         :param update:
         :return:
         """
@@ -101,21 +125,40 @@ class RepositoryPort(ABC):
         """
         pass
 
-    @abstractmethod
     @overload
     async def get_user_id(self, tg_id: int) -> UUID:
         """
-        Gets user uuid from the repository by tg id
-        :param tg_id:
-        :return:
-        """
-        pass
+        Gets user UUID from the repository by Telegram ID.
 
-    @abstractmethod
+        :param tg_id: Telegram user ID
+        :return: Internal user UUID
+        """
+        ...
+
+    @overload
     async def get_user_id(self, user_id: UUID) -> int:
         """
-        Gets user tg id from the repository by id
-        :param user_id:
-        :return:
+        Gets Telegram ID from the repository by internal user UUID.
+
+        :param user_id: Internal user UUID
+        :return: Telegram user ID
+        """
+        ...
+
+    @abstractmethod
+    async def get_user_id(self, key: Union[int, UUID]) -> Union[UUID, int]:
+        """
+        Gets either user UUID by Telegram ID, or Telegram ID by user UUID.
+
+        :param key: Telegram user ID (int) or internal user UUID
+        :return: UUID if input is int, or int if input is UUID
+        """
+
+
+class LocalePort(ABC):
+    @abstractmethod
+    def __call__(self, locale: str) -> Callable[[str], str]:
+        """
+        Returns func which returns needed locale
         """
         pass
