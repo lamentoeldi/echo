@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from uuid import UUID
-from typing import Optional
+from typing import Optional, Literal, List
 
 
 class ProcessingError(BaseModel):
@@ -49,6 +49,9 @@ class AudioTranscribedMessage(BaseModel):
 
 
 class User(BaseModel):
+    """
+    Represents bot User
+    """
     id: UUID = Field()
     tg_id: int = Field()
     tg_username: str = Field()
@@ -56,5 +59,25 @@ class User(BaseModel):
 
 
 class UserUpdate(BaseModel):
+    """
+    Represents Updates for repository
+    """
     tg_username: Optional[str] = None
     language: Optional[str] = None
+
+
+class KeyboardButton(BaseModel):
+    """
+    Abstracts tg keyboard button
+    """
+    text: str
+    callback_data: Optional[str] = None
+
+
+class KeyboardMarkup(BaseModel):
+    """
+    Abstracts tg keyboard markup
+    """
+    type: Literal["inline", "reply"]
+    buttons: List[List[KeyboardButton]]
+
