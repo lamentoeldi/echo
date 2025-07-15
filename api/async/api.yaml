@@ -32,7 +32,8 @@ components:
   messages:
     AudioRaw:
       name: audio_raw
-      title: Raw audio metadata
+      title: AudioRaw
+      description: Raw audio metadata
       contentType: application/json
       payload:
         type: object
@@ -43,7 +44,8 @@ components:
             $ref: '#/components/schemas/AudioRaw'
     AudioPreprocessed:
       name: audio_preprocessed
-      title: Preprocessed audio metadata
+      title: AudioPreprocessed
+      description: Preprocessed audio metadata
       contentType: application/json
       payload:
         type: object
@@ -54,7 +56,8 @@ components:
             $ref: '#/components/schemas/AudioPreprocessed'
     AudioTranscribedTg:
       name: audio_transcribed_tg
-      title: Transcribed audio metadata
+      title: AudioTranscribedTg
+      description: Transcribed audio metadata
       contentType: application/json
       payload:
         type: object
@@ -163,9 +166,6 @@ components:
         transcription:
           type: string
           description: Audio transcription
-        size:
-          type: integer
-          description: Size of audio in bytes
         timestamp:
           type: integer
           description: Audio timestamp in UNIX nano format
