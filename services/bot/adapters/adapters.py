@@ -7,9 +7,10 @@ from services.bot.domain.ports.output import (
     LocalePort,
     KeyboardProviderPort,
     StoragePort,
-    RepositoryPort
+    RepositoryPort,
+    MessageBusPort
 )
-from services.bot.domain.models import KeyboardMarkup, KeyboardButton, User, UserUpdate
+from services.bot.domain.models import KeyboardMarkup, KeyboardButton, User, UserUpdate, AudioRawMessage
 from services.bot.infrastructure.db.schema import Base, Users
 
 from aioboto3 import Session
@@ -19,6 +20,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, async_sessi
 from sqlalchemy import create_engine
 from sqlalchemy.future import select
 from sqlalchemy import delete
+from aiokafka import AIOKafkaProducer
 
 
 class JSONLocaleProvider(LocalePort):
@@ -266,3 +268,26 @@ class PostgresORMRepository(RepositoryPort):
             return user.tg_id
         else:
             raise TypeError("Invalid key type for get_user_id")
+
+
+class KafkaConfig(BaseSettings):
+    kafka_bootstrap_servers: list[str] = Field()
+
+
+class KafkaMessageBus(MessageBusPort):
+    cfg: KafkaConfig
+
+    def __init__(self, cfg: KafkaConfig):
+        self.cfg = cfg
+
+    async def publish_audio(self, md: AudioRawMessage):
+        async with (AIOKafkaProducer(bootstrap_servers=self.cfg.kafka_bootstrap_servers) as producer):
+            await (
+                producer
+                .send(
+                    topic="audio_raw",
+                    value=md.model_dump_json(
+                        exclude_none=True
+                    )
+                    .encode("utf-8"))
+            )

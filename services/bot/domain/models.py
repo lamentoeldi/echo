@@ -10,7 +10,7 @@ class ProcessingError(BaseModel):
 
 class MessageMeta(BaseModel):
     status: str = Field()
-    error: ProcessingError = Field()
+    error: Optional[ProcessingError] = None
 
 
 class AudioRaw(BaseModel):
