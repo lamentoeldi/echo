@@ -2,6 +2,7 @@ pydantic
 pydantic-settings
 aiogram
 uuid6
+aioboto3
 
 pytest
 pytest-asyncio
