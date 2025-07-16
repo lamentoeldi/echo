@@ -5,7 +5,7 @@ from typing import Callable, Union
 
 from typing_extensions import overload
 
-from classes import (
+from ..models import (
     AudioRawMessage,
     User,
     UserUpdate,
@@ -151,7 +151,7 @@ class RepositoryPort(ABC):
         Gets either user UUID by Telegram ID, or Telegram ID by user UUID.
 
         :param key: Telegram user ID (int) or internal user UUID
-        :return: UUID if input is int, or int if input is UUID
+        :return:
         """
 
 
@@ -160,5 +160,24 @@ class LocalePort(ABC):
     def __call__(self, locale: str) -> Callable[[str], str]:
         """
         Returns func which returns needed locale
+        """
+        pass
+
+
+class KeyboardProviderPort(ABC):
+    @abstractmethod
+    def get_settings_keyboard(self, locale: str) -> KeyboardMarkup:
+        """
+        Returns the inline keyboard with available settings
+        :param locale:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def get_languages_keyboard(self) -> KeyboardMarkup:
+        """
+        Returns the reply keyboard with available languages
+        :return:
         """
         pass

@@ -80,4 +80,3 @@ class KeyboardMarkup(BaseModel):
     """
     type: Literal["inline", "reply"]
     buttons: List[List[KeyboardButton]]
-

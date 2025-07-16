@@ -1,22 +1,69 @@
 import io
+from abc import ABC, abstractmethod
+from uuid import UUID
 
-from interfaces import (
-    AbstractCore,
+from ..domain.ports.input import (
     AbstractStartUseCase,
     AbstractHelpUseCase,
     AbstractSettingsUseCase,
     AbstractInvalidInputUseCase,
     AbstractVoiceMessageUseCase
 )
-from ports import (
+from ..domain.ports.output import (
     RepositoryPort,
     LocalePort,
     BotAPIPort,
     MessageBusPort,
-    StoragePort
+    StoragePort,
+    KeyboardProviderPort
 )
-from config import BotConfig
-from classes import UserUpdate
+from ..domain.models import (
+    UserUpdate,
+    User,
+    AudioRawMessage
+)
+from ..config import BotConfig
+
+
+class AbstractCore(ABC):
+    @abstractmethod
+    def create_user(self, tg_id: int, tg_username: str, lang: str) -> User:
+        """
+        Creates a new user
+        :param tg_id:
+        :param tg_username:
+        :param lang:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def create_audio_md(self, user_id: UUID, audio: io.BytesIO) -> AudioRawMessage:
+        """
+        Creates an audio md object
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def create_audio_transcription(self, locale_msg: str, transcription: str) -> str:
+        """
+        Creates an audio transcription message with markup
+        :param locale_msg:
+        :param transcription:
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def create_error_text(self, locale_msg: str, error: str) -> str:
+        """
+        Creates an error text message with markup
+        :param locale_msg:
+        :param error:
+        :return:
+        """
+        pass
 
 
 class StartUseCase(AbstractStartUseCase):
@@ -104,12 +151,14 @@ class SettingsUseCase(AbstractSettingsUseCase):
         core: AbstractCore,
         repo: RepositoryPort,
         locale: LocalePort,
-        bot: BotAPIPort
+        bot: BotAPIPort,
+        kb: KeyboardProviderPort
     ):
         self.core = core
         self.repo = repo
         self.locale = locale
         self.bot = bot
+        self.kb = kb
 
     async def handle_settings(self, tg_id: int):
         lang = ((
@@ -122,7 +171,7 @@ class SettingsUseCase(AbstractSettingsUseCase):
 
         kb = (
             self
-            .core
+            .kb
             .get_settings_keyboard(lang)
         )
 
@@ -145,7 +194,7 @@ class SettingsUseCase(AbstractSettingsUseCase):
 
         kb = (
             self
-            .core
+            .kb
             .get_languages_keyboard()
         )
 
@@ -236,7 +285,7 @@ class VoiceMessageUseCase(AbstractVoiceMessageUseCase):
         md = (
             self
             .core
-            .create_audio_md(str(user.id), audio)
+            .create_audio_md(user.id, audio)
         )
 
         filename = str(md.content.id)

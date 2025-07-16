@@ -2,9 +2,8 @@ import io
 import time
 from uuid import UUID
 
-from interfaces import AbstractCore
-from classes import (
-    KeyboardMarkup,
+from ..application.usecases import AbstractCore
+from ..domain.models import (
     AudioRawMessage,
     User,
     MessageMeta,
@@ -62,4 +61,3 @@ class Core(AbstractCore):
 
     def create_error_text(self, locale_msg: str, error: str) -> str:
         return f'{locale_msg}\n\n{error}'
-

@@ -1,49 +1,5 @@
 import io
 from abc import ABC, abstractmethod
-from uuid import UUID
-
-from classes import User, AudioRawMessage, KeyboardMarkup
-
-
-class AbstractCore(ABC):
-    @abstractmethod
-    def create_user(self, tg_id: int, tg_username: str, lang: str) -> User:
-        """
-        Creates a new user
-        :param tg_id:
-        :param tg_username:
-        :param lang:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    def create_audio_md(self, user_id: UUID, audio: io.BytesIO) -> AudioRawMessage:
-        """
-        Creates an audio md object
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    def create_audio_transcription(self, locale_msg: str, transcription: str) -> str:
-        """
-        Creates an audio transcription message with markup
-        :param locale_msg:
-        :param transcription:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    def create_error_text(self, locale_msg: str, error: str) -> str:
-        """
-        Creates an error text message with markup
-        :param locale_msg:
-        :param error:
-        :return:
-        """
-        pass
 
 
 class AbstractStartUseCase(ABC):
@@ -141,25 +97,6 @@ class AbstractVoiceMessageUseCase(ABC):
         Sends error message back to user after processing voice message if failed
         :param user_id:
         :param error:
-        :return:
-        """
-        pass
-
-
-class AbstractKeyboardProvider(ABC):
-    @abstractmethod
-    def get_settings_keyboard(self, locale: str) -> KeyboardMarkup:
-        """
-        Returns the inline keyboard with available settings
-        :param locale:
-        :return:
-        """
-        pass
-
-    @abstractmethod
-    def get_languages_keyboard(self) -> KeyboardMarkup:
-        """
-        Returns the reply keyboard with available languages
         :return:
         """
         pass

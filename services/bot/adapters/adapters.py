@@ -1,10 +1,26 @@
 from json import loads
+from typing import Callable, Dict
 
-from interfaces import AbstractKeyboardProvider
-from classes import KeyboardMarkup, KeyboardButton
+from ..domain.ports.output import LocalePort, KeyboardProviderPort
+from ..domain.models import KeyboardMarkup, KeyboardButton
 
 
-class KeyboardProvider(AbstractKeyboardProvider):
+class JSONLocaleProvider(LocalePort):
+    locale: Dict[str, Dict[str, str]]
+
+    def __init__(self, json: str):
+        self.locale = loads(json)
+
+    def __call__(self, locale: str) -> Callable[[str], str]:
+        locale_dict = self.locale[locale]
+
+        def locale_func(line: str) -> str:
+            return locale_dict[line]
+
+        return locale_func
+
+
+class KeyboardProvider(KeyboardProviderPort):
     keyboards: dict
 
     def __init__(self, json: str):
