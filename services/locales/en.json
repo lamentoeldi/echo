@@ -1,0 +1,11 @@
+{
+  "greeting": "greeting_stub",
+  "help": "help_stub",
+  "settings": "settings_stub",
+  "change_language": "change_language_stub",
+  "language_set": "language_set_stub",
+  "invalid_input": "invalid_input_stub",
+  "vm_accepted": "vm_accepted_stub",
+  "transcription_success": "transcription_success_stub",
+  "transcription_error": "transcription_error_stub"
+}
