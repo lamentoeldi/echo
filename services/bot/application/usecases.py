@@ -2,14 +2,14 @@ import io
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from ..domain.ports.input import (
+from services.bot.domain.ports.input import (
     AbstractStartUseCase,
     AbstractHelpUseCase,
     AbstractSettingsUseCase,
     AbstractInvalidInputUseCase,
     AbstractVoiceMessageUseCase
 )
-from ..domain.ports.output import (
+from services.bot.domain.ports.output import (
     RepositoryPort,
     LocalePort,
     BotAPIPort,
@@ -17,12 +17,12 @@ from ..domain.ports.output import (
     StoragePort,
     KeyboardProviderPort
 )
-from ..domain.models import (
+from services.bot.domain.models import (
     UserUpdate,
     User,
     AudioRawMessage
 )
-from ..config import BotConfig
+from services.bot.config import BotConfig
 
 
 class AbstractCore(ABC):
@@ -276,6 +276,8 @@ class VoiceMessageUseCase(AbstractVoiceMessageUseCase):
         self.storage = storage
 
     async def start_vm_handling(self, tg_id: int, audio: io.BytesIO):
+        audio.seek(0)
+
         user = await (
             self
             .repo
@@ -288,7 +290,7 @@ class VoiceMessageUseCase(AbstractVoiceMessageUseCase):
             .create_audio_md(user.id, audio)
         )
 
-        filename = str(md.content.id)
+        filename = f"{md.content.id}.ogg"
 
         await (
             self

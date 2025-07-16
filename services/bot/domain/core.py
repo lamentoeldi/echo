@@ -2,16 +2,16 @@ import io
 import time
 from uuid import UUID
 
-from ..application.usecases import AbstractCore
-from ..domain.models import (
+from services.bot.application.usecases import AbstractCore
+from services.bot.domain.models import (
     AudioRawMessage,
     User,
     MessageMeta,
     AudioRaw
 )
 
+import soundfile as sf
 from uuid6 import uuid7
-from pydub import AudioSegment
 
 
 class Core(AbstractCore):
@@ -32,10 +32,12 @@ class Core(AbstractCore):
 
         md_id = uuid7()
 
-        audio = AudioSegment.from_ogg(vm)
+        data, samplerate = sf.read(vm)
 
-        duration_ms = round(audio.duration_seconds) * 1000
+        duration_ms = int(len(data) / samplerate * 1000)
         size = vm.getbuffer().nbytes
+
+        channels = 1 if len(data.shape) == 1 else data.shape[1]
 
         md = AudioRawMessage(
             meta=MessageMeta(
@@ -47,8 +49,8 @@ class Core(AbstractCore):
                 duration=duration_ms,
                 size=size,
                 format="ogg",
-                sample_rate=audio.frame_rate,
-                channels=audio.channels,
+                sample_rate=samplerate,
+                channels=channels,
                 source="tg",
                 timestamp=time.time_ns()
             )

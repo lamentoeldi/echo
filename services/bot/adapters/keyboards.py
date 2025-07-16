@@ -1,4 +1,4 @@
-from json import loads
+from json import load
 
 from services.bot.domain.ports.output import KeyboardProviderPort
 from services.bot.domain.models import KeyboardMarkup, KeyboardButton
@@ -7,8 +7,9 @@ from services.bot.domain.models import KeyboardMarkup, KeyboardButton
 class KeyboardProvider(KeyboardProviderPort):
     keyboards: dict
 
-    def __init__(self, json: str):
-        self.keyboards = loads(json)
+    def __init__(self, path: str):
+        with open(path, 'r') as f:
+            self.keyboards = load(f)
 
     def get_settings_keyboard(self, lang: str) -> KeyboardMarkup:
         buttons: dict[str, str] = self.keyboards[lang]["kb_settings"]

@@ -8,6 +8,7 @@ asyncpg
 greenlet
 psycopg2-binary
 aiokafka
+soundfile
 
 pytest
 pytest-asyncio

@@ -25,6 +25,8 @@ class S3StoragePort(StoragePort):
         self.config = config
 
     async def upload_audio(self, filename: str, audio: BytesIO):
+        audio.seek(0)
+
         sess = Session(
             aws_access_key_id=self.config.s3_access_key_id,
             aws_secret_access_key=self.config.s3_secret_access_key,
