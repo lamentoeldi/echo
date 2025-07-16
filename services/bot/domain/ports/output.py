@@ -117,7 +117,7 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
-    async def delete_user(self, tg_id: int) -> User:
+    async def delete_user(self, tg_id: int):
         """
         Deletes a user from the repository by tg id
         :param tg_id:
