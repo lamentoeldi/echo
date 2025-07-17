@@ -1,11 +1,12 @@
 import io
 from uuid import UUID
 from abc import ABC, abstractmethod
+from typing import Optional
 
 
 class AbstractStartUseCase(ABC):
     @abstractmethod
-    async def handle_start(self, tg_id: int, tg_username: str):
+    async def handle_start(self, tg_id: int, tg_username: Optional[str]):
         """
         To handle /start command
         Registers user in system, returns greeting message text

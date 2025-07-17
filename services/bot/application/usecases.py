@@ -1,6 +1,7 @@
 import io
 from abc import ABC, abstractmethod
 from uuid import UUID
+from typing import Optional
 
 from services.bot.domain.ports.input import (
     AbstractStartUseCase,
@@ -81,7 +82,7 @@ class StartUseCase(AbstractStartUseCase):
         self.locale = locale
         self.bot = bot
 
-    async def handle_start(self, tg_id: int, tg_username: str):
+    async def handle_start(self, tg_id: int, tg_username: Optional[str]):
         default_lang = (
             self
             .config

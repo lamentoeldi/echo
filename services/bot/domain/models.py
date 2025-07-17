@@ -54,7 +54,7 @@ class User(BaseModel):
     """
     id: UUID = Field()
     tg_id: int = Field()
-    tg_username: str = Field()
+    tg_username: Optional[str] = Field()
     language: str = Field()
 
 
