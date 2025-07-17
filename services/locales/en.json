@@ -7,5 +7,6 @@
   "invalid_input": "invalid_input_stub",
   "vm_accepted": "vm_accepted_stub",
   "transcription_success": "transcription_success_stub",
-  "transcription_error": "transcription_error_stub"
+  "transcription_error": "transcription_error_stub",
+  "vm_error": "vm_error_stub"
 }
