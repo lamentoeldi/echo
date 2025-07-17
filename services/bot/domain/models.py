@@ -45,7 +45,7 @@ class AudioTranscribedMessage(BaseModel):
     Represents an AudioTranscribedTg message
     """
     meta: MessageMeta = Field()
-    content: AudioRawMessage = Field()
+    content: AudioTranscribed = Field()
 
 
 class User(BaseModel):

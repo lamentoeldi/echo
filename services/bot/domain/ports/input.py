@@ -1,4 +1,5 @@
 import io
+from uuid import UUID
 from abc import ABC, abstractmethod
 
 
@@ -82,7 +83,7 @@ class AbstractVoiceMessageUseCase(ABC):
         pass
 
     @abstractmethod
-    async def send_transcription(self, user_id: int, transcription: str):
+    async def send_transcription(self, user_id: UUID, transcription: str):
         """
         Sends transcription back to user after processing voice message
         :param user_id:
@@ -92,7 +93,7 @@ class AbstractVoiceMessageUseCase(ABC):
         pass
 
     @abstractmethod
-    async def send_error_text(self, user_id: int, error: str):
+    async def send_error_text(self, user_id: UUID):
         """
         Sends error message back to user after processing voice message if failed
         :param user_id:

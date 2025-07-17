@@ -4,3 +4,4 @@ from .keyboards import KeyboardProvider
 from .kafka_mb import KafkaConfig, KafkaMessageBus
 from .s3_storage import S3Config, S3StoragePort
 from .aiogram_botapi import AiogramBotAPI
+from .kafka_consumer import KafkaConsumerConfig, KafkaController

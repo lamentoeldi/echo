@@ -310,48 +310,44 @@ class VoiceMessageUseCase(AbstractVoiceMessageUseCase):
             .send_text(tg_id, self.locale(user.language)("vm_accepted"))
         )
 
-    async def send_transcription(self, tg_id: int, transcription: str):
-        lang = ((
-            await
+    async def send_transcription(self, user_id: UUID, transcription: str):
+        user = await (
             self
             .repo
-            .get_user(tg_id))
-            .language
+            .get_user(user_id)
         )
 
         msg = (
             self
             .core
             .create_audio_transcription(
-                self.locale(lang)("transcription_success"), transcription
+                self.locale(user.language)("transcription_success"), transcription
             )
         )
 
         await (
             self
             .bot
-            .send_text(tg_id, msg)
+            .send_text(user.tg_id, msg)
         )
 
-    async def send_error_text(self, tg_id: int, error: str):
-        lang = ((
-            await
+    async def send_error_text(self, user_id: UUID):
+        user = await (
             self
             .repo
-            .get_user(tg_id))
-            .language
+            .get_user(user_id)
         )
 
         msg = (
             self
             .core
             .create_error_text(
-                self.locale(lang)("transcription_error"), error
+                self.locale(user.language)("transcription_error"), self.locale(user.language)("vm_error")
             )
         )
 
         await (
             self
             .bot
-            .send_text(tg_id, msg)
+            .send_text(user.tg_id, msg)
         )
