@@ -7,6 +7,7 @@ services:
     environment:
       MINIO_ROOT_USER: moonfire
       MINIO_ROOT_PASSWORD: moonfire
+      MINIO_BUCKETS: audio-raw
     command: server /data --console-address ":9001"
   postgres:
     image: postgres:latest
