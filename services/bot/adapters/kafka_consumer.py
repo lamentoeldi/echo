@@ -1,5 +1,11 @@
+from time import time
+
 from services.bot.domain.ports.input import AbstractVoiceMessageUseCase
-from services.bot.domain.models import AudioTranscribedMessage, AudioTranscribed
+from services.bot.domain.models import AudioTranscribedMessage
+from services.bot.infrastructure.metrics import (
+    kafka_consumed,
+    kafka_latency
+)
 
 from aiokafka import AIOKafkaConsumer, ConsumerRecord
 from pydantic import Field
@@ -74,7 +80,12 @@ class KafkaController:
             )
 
             async for msg in self.client:
+                kafka_consumed.inc()
+                start = time()
                 await self._handle_message(msg)
+                end = time() - start
+                kafka_latency.observe(end)
+
                 await (
                     self
                     .client

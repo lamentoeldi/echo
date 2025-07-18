@@ -1,11 +1,50 @@
 from typing import Callable, Dict, Awaitable, Any
+from time import time
 
 from services.bot.domain.ports.input import AbstractErrorResponseUseCase
+from services.bot.infrastructure.metrics import (
+    bot_requests_total,
+    bot_latency,
+    bot_errors_total
+)
 
 from structlog.stdlib import BoundLogger
 from aiogram import BaseMiddleware
 from aiogram.types import Message
 from uuid6 import uuid7
+
+
+class BotLatencyMiddleware(BaseMiddleware):
+    """
+    Bot latency middleware.
+    Calculates request latency.
+    """
+    async def __call__(
+            self,
+            handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+            event: Message,
+            data: Dict[str, Any]
+    ) -> Any:
+        start = time()
+        res = await handler(event, data)
+        end = time() - start
+        bot_latency.observe(end)
+        return res
+
+
+class BotRequestsCounterMiddleware(BaseMiddleware):
+    """
+    Bot requests counter.
+    Calculates request amount.
+    """
+    async def __call__(
+            self,
+            handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+            event: Message,
+            data: Dict[str, Any]
+    ) -> Any:
+        bot_requests_total.inc()
+        return await handler(event, data)
 
 
 class RequestIDMiddleware(BaseMiddleware):
@@ -74,6 +113,7 @@ class ExceptionHandlerMiddleware(BaseMiddleware):
         try:
             return await handler(event, data)
         except Exception as err:
+            bot_errors_total.inc()
             if data.get("log") is not None:
                 log: BoundLogger = data["log"]
                 log.error(str(err))

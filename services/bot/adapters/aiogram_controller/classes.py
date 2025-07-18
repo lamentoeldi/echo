@@ -16,7 +16,9 @@ from .vm_router import vm_router
 from .middleware import (
     RequestIDMiddleware,
     StructuredLoggerMiddleware,
-    ExceptionHandlerMiddleware
+    ExceptionHandlerMiddleware,
+    BotRequestsCounterMiddleware,
+    BotLatencyMiddleware
 )
 
 from aiogram import Dispatcher, Bot
@@ -79,10 +81,14 @@ class AiogramController:
         mw_request_id = RequestIDMiddleware()
         mw_log = StructuredLoggerMiddleware(log)
         mw_exception_handler = ExceptionHandlerMiddleware(uc_error)
+        mw_latency = BotLatencyMiddleware()
+        mw_request_counter = BotRequestsCounterMiddleware()
 
         self.dp.message.middleware(mw_request_id)
+        self.dp.message.middleware(mw_request_counter)
         self.dp.message.middleware(mw_log)
         self.dp.message.middleware(mw_exception_handler)
+        self.dp.message.middleware(mw_latency)
 
     async def start_long_polling(self):
         self.log.info("starting bot api server")
