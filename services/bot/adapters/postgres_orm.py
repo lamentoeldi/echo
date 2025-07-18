@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, async_sessionmaker
 from sqlalchemy.future import select
+from sqlalchemy.exc import IntegrityError
 
 from services.bot.domain.models import User, UserUpdate
 from services.bot.domain.ports.output import RepositoryPort
@@ -60,8 +61,12 @@ class PostgresORMRepository(RepositoryPort):
         obj = Users.from_user(user)
 
         async with self.session_maker() as session:
-            session.add(obj)
-            await session.commit()
+            try:
+                session.add(obj)
+                await session.commit()
+            except IntegrityError as err:  # ignore 23505 pg error cause ON CONFLICT cannot be used via alchemy
+                if err.code != "gkpj":
+                    raise err
 
     @overload
     async def get_user(self, tg_id: int) -> User:
