@@ -36,3 +36,9 @@ services:
     ports:
       - '9092:9092'
       - '9093:9093'
+  tg-bot:
+    image: bot
+    build:
+      context: ./services/bot
+    environment:
+      PYTHONPATH: src
