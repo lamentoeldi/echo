@@ -41,4 +41,25 @@ services:
     build:
       context: ./services/bot
     environment:
-      PYTHONPATH: src
+      S3_ACCESS_KEY_ID: moonfire
+      S3_SECRET_ACCESS_KEY: moonfire
+      S3_URL: http://s3:9000
+
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+      PG_DB: postgres
+
+      KAFKA_BOOTSTRAP_SERVERS: '["kafka:9092"]'
+      KAFKA_CONSUMER_GROUP: tg_bot
+
+      DEFAULT_LOCALE: en
+
+      BOT_TOKEN: "${BOT_TOKEN}"
+    depends_on:
+      - postgres
+      - s3
+      - kafka
+    ports:
+      - '9090:9090'
