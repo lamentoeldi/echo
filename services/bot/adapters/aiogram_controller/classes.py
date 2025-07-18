@@ -1,3 +1,5 @@
+from typing import Literal, Optional, Self
+
 from services.bot.domain.ports.input import (
     AbstractStartUseCase,
     AbstractHelpUseCase,
@@ -13,14 +15,24 @@ from .vm_router import vm_router
 
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.base import BaseStorage
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings
 
 
 class AiogramConfig(BaseSettings):
     bot_token: str = Field()
-    webhook_url: str = Field()
-    webhook_secret: str = Field()
+    bot_api_mode: Literal["long_polling", "webhook"] = Field(default="long_polling")
+
+    webhook_url: Optional[str] = Field()
+    webhook_secret: Optional[str] = Field()
+
+    @model_validator(mode="before")
+    def validate_webhook_params(self) -> Self:
+        if self.bot_api_mode == "long_polling":
+            return self
+
+        if self.webhook_url is None or self.webhook_secret is None:
+            raise ValueError("webhook params cannot be None in webhook mode")
 
 
 class AiogramController:

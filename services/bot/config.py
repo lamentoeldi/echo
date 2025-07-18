@@ -3,7 +3,4 @@ from pydantic import Field
 
 
 class BotConfig(BaseSettings):
-    bot_token: str = Field()
-    webhook_secret: str = Field()
-
     default_locale: str = Field()

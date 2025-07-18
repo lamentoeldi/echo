@@ -10,13 +10,21 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
     KeyboardButton as ReplyKeyboardButton
 )
+from pydantic import Field
+from pydantic_settings import BaseSettings
+
+
+class AiogramBotAPIConfig(BaseSettings):
+    bot_token: str = Field()
 
 
 class AiogramBotAPI(BotAPIPort):
+    cfg: AiogramBotAPIConfig
     bot: Bot
 
-    def __init__(self, bot: Bot):
-        self.bot = bot
+    def __init__(self, cfg: AiogramBotAPIConfig):
+        self.cfg = cfg
+        self.bot = Bot(token=self.cfg.bot_token)
 
     @staticmethod
     def _get_inline_kb(markup: KeyboardMarkup) -> InlineKeyboardMarkup:

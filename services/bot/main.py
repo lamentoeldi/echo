@@ -5,7 +5,7 @@ from services.bot.adapters.aiogram_controller import (
     AiogramController
 )
 from services.bot.adapters import (
-    AiogramBotAPI,
+    AiogramBotAPIConfig, AiogramBotAPI,
     KafkaConfig, KafkaMessageBus,
     KafkaConsumerConfig, KafkaController,
     PostgresConfig, PostgresORMRepository,
@@ -23,7 +23,6 @@ from services.bot.domain.core import Core
 from services.bot.config import BotConfig
 
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram import Bot
 
 
 async def main():
@@ -37,7 +36,8 @@ async def main():
     pg_cfg = PostgresConfig()
     pg_repo = PostgresORMRepository(pg_cfg)
 
-    bot = AiogramBotAPI(Bot(bot_cfg.bot_token))
+    aiogram_bot_api_cfg = AiogramBotAPIConfig()
+    bot = AiogramBotAPI(aiogram_bot_api_cfg)
 
     kafka_producer_cfg = KafkaConfig()
     kafka_producer = KafkaMessageBus(kafka_producer_cfg)
