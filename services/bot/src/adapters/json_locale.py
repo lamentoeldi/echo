@@ -2,7 +2,7 @@ from typing import Dict, Callable
 from json import load
 import os
 
-from services.bot.domain.ports.output import LocalePort
+from domain.ports.output import LocalePort
 
 
 class JSONLocaleProvider(LocalePort):

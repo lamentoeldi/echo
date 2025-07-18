@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 from typing import Optional
 
-from services.bot.domain.ports.input import (
+from domain.ports.input import (
     AbstractStartUseCase,
     AbstractHelpUseCase,
     AbstractSettingsUseCase,
@@ -11,7 +11,7 @@ from services.bot.domain.ports.input import (
     AbstractVoiceMessageUseCase,
     AbstractErrorResponseUseCase
 )
-from services.bot.domain.ports.output import (
+from domain.ports.output import (
     RepositoryPort,
     LocalePort,
     BotAPIPort,
@@ -19,13 +19,13 @@ from services.bot.domain.ports.output import (
     StoragePort,
     KeyboardProviderPort
 )
-from services.bot.domain.models import (
+from domain.models import (
     UserUpdate,
     User,
     AudioRawMessage,
     RemoveReplyKeyboard
 )
-from services.bot.config import BotConfig
+from config import BotConfig
 
 
 class AbstractCore(ABC):

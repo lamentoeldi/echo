@@ -1,6 +1,6 @@
 from typing import Literal, Optional, Self
 
-from services.bot.domain.ports.input import (
+from domain.ports.input import (
     AbstractStartUseCase,
     AbstractHelpUseCase,
     AbstractInvalidInputUseCase,

@@ -1,4 +1,4 @@
-from services.bot.domain.ports.input import AbstractStartUseCase
+from domain.ports.input import AbstractStartUseCase
 
 from aiogram import Router
 from aiogram.filters import CommandStart

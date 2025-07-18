@@ -1,4 +1,4 @@
-from ...domain.models import User
+from domain.models import User
 
 from sqlalchemy import Column, func
 from sqlalchemy.dialects.postgresql import UUID, BIGINT, VARCHAR, TIMESTAMP

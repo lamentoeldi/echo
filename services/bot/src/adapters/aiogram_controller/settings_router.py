@@ -1,7 +1,7 @@
-from services.bot.domain.ports.input import AbstractSettingsUseCase
+from domain.ports.input import AbstractSettingsUseCase
 from .states import Settings
 
-from aiogram import Router, Bot
+from aiogram import Router
 from aiogram.filters import Command
 from aiogram.filters.callback_data import CallbackQuery
 from aiogram.fsm.context import FSMContext

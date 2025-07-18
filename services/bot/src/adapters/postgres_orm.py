@@ -9,9 +9,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, async_sessi
 from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
 
-from services.bot.domain.models import User, UserUpdate
-from services.bot.domain.ports.output import RepositoryPort
-from services.bot.infrastructure.db.schema import Base, Users
+from domain.models import User, UserUpdate
+from domain.ports.output import RepositoryPort
+from infrastructure.db.schema import Base, Users
 
 
 class PostgresConfig(BaseSettings):

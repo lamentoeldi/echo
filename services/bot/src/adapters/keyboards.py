@@ -1,7 +1,7 @@
 from json import load
 
-from services.bot.domain.ports.output import KeyboardProviderPort
-from services.bot.domain.models import KeyboardMarkup, KeyboardButton
+from domain.ports.output import KeyboardProviderPort
+from domain.models import KeyboardMarkup, KeyboardButton
 
 
 class KeyboardProvider(KeyboardProviderPort):

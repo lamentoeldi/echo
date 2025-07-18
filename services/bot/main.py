@@ -3,11 +3,11 @@ import logging
 import sys
 from logging import StreamHandler, DEBUG
 
-from services.bot.adapters.aiogram_controller import (
+from src.adapters import (
     AiogramConfig,
     AiogramController
 )
-from services.bot.adapters import (
+from src.adapters import (
     AiogramBotAPIConfig, AiogramBotAPI,
     KafkaConfig, KafkaMessageBus,
     KafkaConsumerConfig, KafkaController,
@@ -15,7 +15,7 @@ from services.bot.adapters import (
     KeyboardProvider, JSONLocaleProvider,
     S3Config, S3StoragePort
 )
-from services.bot.application.usecases import (
+from src.application.usecases import (
     StartUseCase,
     HelpUseCase,
     SettingsUseCase,
@@ -23,9 +23,9 @@ from services.bot.application.usecases import (
     VoiceMessageUseCase,
     ErrorResponseUseCase
 )
-from services.bot.domain.core import Core
-from services.bot.config import BotConfig
-from services.bot.infrastructure.metrics import MetricsServerConfig, MetricsServer
+from src.domain.core import Core
+from src.config import BotConfig
+from src.infrastructure.metrics import MetricsServerConfig, MetricsServer
 
 import structlog
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -74,8 +74,8 @@ async def main():
 
     bot_cfg = BotConfig()
 
-    locale = JSONLocaleProvider("./locales")
-    keyboards = KeyboardProvider("./keyboards/keyboards.json")
+    locale = JSONLocaleProvider("locales")
+    keyboards = KeyboardProvider("keyboards/keyboards.json")
 
     pg_cfg = PostgresConfig()
     pg_repo = PostgresORMRepository(pg_cfg)

@@ -2,8 +2,8 @@ import io
 import time
 from uuid import UUID
 
-from services.bot.application.usecases import AbstractCore
-from services.bot.domain.models import (
+from application.usecases import AbstractCore
+from domain.models import (
     AudioRawMessage,
     User,
     MessageMeta,

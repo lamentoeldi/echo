@@ -1,4 +1,4 @@
-from services.bot.domain.ports.input import AbstractInvalidInputUseCase
+from domain.ports.input import AbstractInvalidInputUseCase
 
 from aiogram import Router
 from aiogram.types import Message

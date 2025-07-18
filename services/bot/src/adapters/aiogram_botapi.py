@@ -1,7 +1,7 @@
 from typing import Union, Optional
 
-from services.bot.domain.models import KeyboardMarkup, RemoveReplyKeyboard
-from services.bot.domain.ports.output import BotAPIPort
+from domain.models import KeyboardMarkup, RemoveReplyKeyboard
+from domain.ports.output import BotAPIPort
 
 from aiogram import Bot
 from aiogram.types import (

@@ -1,6 +1,6 @@
 import time
 
-from .registry import uptime, _start_time
+from .registry import Metrics
 
 from aiohttp.web import (
     Application,
@@ -49,7 +49,7 @@ class MetricsServer:
 
     @staticmethod
     async def handle_metrics(_: Request) -> StreamResponse:
-        uptime.set(time.time() - _start_time)
+        Metrics().update_uptime()
         return Response(body=generate_latest(), content_type="text/plain")
 
     async def start(self):

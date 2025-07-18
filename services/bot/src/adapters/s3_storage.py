@@ -5,7 +5,7 @@ from aioboto3 import Session
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
-from services.bot.domain.ports.output import StoragePort
+from domain.ports.output import StoragePort
 
 
 class S3Config(BaseSettings):

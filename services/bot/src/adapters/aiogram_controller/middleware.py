@@ -1,12 +1,8 @@
 from typing import Callable, Dict, Awaitable, Any
 from time import time
 
-from services.bot.domain.ports.input import AbstractErrorResponseUseCase
-from services.bot.infrastructure.metrics import (
-    bot_requests_total,
-    bot_latency,
-    bot_errors_total
-)
+from domain.ports.input import AbstractErrorResponseUseCase
+from infrastructure.metrics import Metrics
 
 from structlog.stdlib import BoundLogger
 from aiogram import BaseMiddleware
@@ -28,7 +24,7 @@ class BotLatencyMiddleware(BaseMiddleware):
         start = time()
         res = await handler(event, data)
         end = time() - start
-        bot_latency.observe(end)
+        Metrics().bot_latency.observe(end)
         return res
 
 
@@ -43,7 +39,7 @@ class BotRequestsCounterMiddleware(BaseMiddleware):
             event: Message,
             data: Dict[str, Any]
     ) -> Any:
-        bot_requests_total.inc()
+        Metrics().bot_requests_total.inc()
         return await handler(event, data)
 
 
@@ -113,7 +109,7 @@ class ExceptionHandlerMiddleware(BaseMiddleware):
         try:
             return await handler(event, data)
         except Exception as err:
-            bot_errors_total.inc()
+            Metrics().bot_errors_total.inc()
             if data.get("log") is not None:
                 log: BoundLogger = data["log"]
                 log.error(str(err))

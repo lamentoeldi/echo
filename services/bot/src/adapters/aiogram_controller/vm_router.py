@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from services.bot.domain.ports.input import AbstractVoiceMessageUseCase
+from domain.ports.input import AbstractVoiceMessageUseCase
 
 from aiogram import Router, F, Bot
 from aiogram.types import Message

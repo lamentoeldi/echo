@@ -1,7 +1,7 @@
-from services.bot.domain.ports.output import (
+from domain.ports.output import (
     MessageBusPort
 )
-from services.bot.domain.models import AudioRawMessage
+from domain.models import AudioRawMessage
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
