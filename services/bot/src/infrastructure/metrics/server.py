@@ -1,6 +1,4 @@
-import time
-
-from .registry import Metrics
+from time import time
 
 from aiohttp.web import (
     Application,
@@ -15,6 +13,14 @@ from pydantic import Field
 from pydantic_settings import BaseSettings
 from prometheus_client import generate_latest
 from structlog.stdlib import BoundLogger
+from prometheus_client import Gauge
+
+_start_time = time()
+
+uptime = Gauge(
+    "tg_bot_uptime",
+    "bot instance uptime",
+)
 
 
 class MetricsServerConfig(BaseSettings):
@@ -49,8 +55,9 @@ class MetricsServer:
 
     @staticmethod
     async def handle_metrics(_: Request) -> StreamResponse:
-        Metrics().update_uptime()
-        return Response(body=generate_latest(), content_type="text/plain")
+        uptime.set(time() - _start_time)
+        metrics = generate_latest()
+        return Response(body=metrics, content_type="text/plain")
 
     async def start(self):
         self._runner = AppRunner(self.app)

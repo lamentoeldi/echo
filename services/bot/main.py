@@ -74,8 +74,8 @@ async def main():
 
     bot_cfg = BotConfig()
 
-    locale = JSONLocaleProvider("locales")
-    keyboards = KeyboardProvider("keyboards/keyboards.json")
+    locale = JSONLocaleProvider("src/locales")
+    keyboards = KeyboardProvider("src/keyboards/keyboards.json")
 
     pg_cfg = PostgresConfig()
     pg_repo = PostgresORMRepository(pg_cfg)

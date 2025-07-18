@@ -2,12 +2,28 @@ from time import time
 
 from domain.ports.input import AbstractVoiceMessageUseCase
 from domain.models import AudioTranscribedMessage
-from infrastructure.metrics import Metrics
 
 from aiokafka import AIOKafkaConsumer, ConsumerRecord
 from pydantic import Field
 from pydantic_settings import BaseSettings
 from structlog.stdlib import BoundLogger
+from prometheus_client import Counter, Histogram
+
+_latency_buckets = [0.1, 0.5, 1.0, 1.5, 2.5, 5.0]
+
+kafka_consumed = Counter(
+    "tg_bot_kafka_consumed",
+    "total amount of consumed messages",
+)
+kafka_errors = Counter(
+    "tg_bot_kafka_errors",
+    "total amount of kafka consumer errors",
+)
+kafka_latency = Histogram(
+    "tg_bot_kafka_latency",
+    "kafka response latency",
+    buckets=_latency_buckets,
+)
 
 
 class KafkaConsumerConfig(BaseSettings):
@@ -77,11 +93,11 @@ class KafkaController:
             )
 
             async for msg in self.client:
-                Metrics().kafka_consumed.inc()
+                kafka_consumed.inc()
                 start = time()
                 await self._handle_message(msg)
                 end = time() - start
-                Metrics().kafka_latency.observe(end)
+                kafka_latency.observe(end)
 
                 await (
                     self

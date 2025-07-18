@@ -2,12 +2,28 @@ from typing import Callable, Dict, Awaitable, Any
 from time import time
 
 from domain.ports.input import AbstractErrorResponseUseCase
-from infrastructure.metrics import Metrics
 
 from structlog.stdlib import BoundLogger
 from aiogram import BaseMiddleware
 from aiogram.types import Message
 from uuid6 import uuid7
+from prometheus_client import Counter, Histogram
+
+_latency_buckets = [0.1, 0.5, 1.0, 1.5, 2.5, 5.0]
+
+bot_requests_total = Counter(
+    "tg_bot_requests_total",
+    "total bot requests",
+)
+bot_errors_total = Counter(
+    "tg_bot_errors_total",
+    "total bot errors",
+)
+bot_latency = Histogram(
+    "tg_bot_latency",
+    "bot response latency",
+    buckets=_latency_buckets,
+)
 
 
 class BotLatencyMiddleware(BaseMiddleware):
@@ -24,7 +40,7 @@ class BotLatencyMiddleware(BaseMiddleware):
         start = time()
         res = await handler(event, data)
         end = time() - start
-        Metrics().bot_latency.observe(end)
+        bot_latency.observe(end)
         return res
 
 
@@ -39,7 +55,7 @@ class BotRequestsCounterMiddleware(BaseMiddleware):
             event: Message,
             data: Dict[str, Any]
     ) -> Any:
-        Metrics().bot_requests_total.inc()
+        bot_requests_total.inc()
         return await handler(event, data)
 
 
@@ -109,7 +125,7 @@ class ExceptionHandlerMiddleware(BaseMiddleware):
         try:
             return await handler(event, data)
         except Exception as err:
-            Metrics().bot_errors_total.inc()
+            bot_errors_total.inc()
             if data.get("log") is not None:
                 log: BoundLogger = data["log"]
                 log.error(str(err))

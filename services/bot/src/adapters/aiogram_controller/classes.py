@@ -32,8 +32,8 @@ class AiogramConfig(BaseSettings):
     bot_token: str = Field()
     bot_api_mode: Literal["long_polling", "webhook"] = Field(default="long_polling")
 
-    webhook_url: Optional[str] = Field()
-    webhook_secret: Optional[str] = Field()
+    webhook_url: Optional[str] = None
+    webhook_secret: Optional[str] = None
 
     @model_validator(mode="after")
     def validate_webhook_params(self) -> Self:
