@@ -48,7 +48,6 @@ class AbstractSettingsUseCase(ABC):
         Sends keyboard with bot settings
         :return:
         """
-        pass
 
     @abstractmethod
     async def change_language(self, user_id: int):
@@ -58,7 +57,6 @@ class AbstractSettingsUseCase(ABC):
         :param user_id:
         :return:
         """
-        pass
 
     @abstractmethod
     async def set_language(self, tg_id: int, new_lang: str):
@@ -68,7 +66,6 @@ class AbstractSettingsUseCase(ABC):
         :param new_lang:
         :return:
         """
-        pass
 
 
 class AbstractVoiceMessageUseCase(ABC):
@@ -81,7 +78,6 @@ class AbstractVoiceMessageUseCase(ABC):
         :param audio:
         :return:
         """
-        pass
 
     @abstractmethod
     async def send_transcription(self, user_id: UUID, transcription: str):
@@ -91,14 +87,21 @@ class AbstractVoiceMessageUseCase(ABC):
         :param transcription:
         :return:
         """
-        pass
 
     @abstractmethod
     async def send_error_text(self, user_id: UUID):
         """
         Sends error message back to user after processing voice message if failed
         :param user_id:
-        :param error:
         :return:
         """
-        pass
+
+
+class AbstractErrorResponseUseCase(ABC):
+    @abstractmethod
+    async def handle_error(self, tg_id: int):
+        """
+        Sends error message to user
+        :param tg_id:
+        :return:
+        """

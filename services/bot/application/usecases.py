@@ -8,7 +8,8 @@ from services.bot.domain.ports.input import (
     AbstractHelpUseCase,
     AbstractSettingsUseCase,
     AbstractInvalidInputUseCase,
-    AbstractVoiceMessageUseCase
+    AbstractVoiceMessageUseCase,
+    AbstractErrorResponseUseCase
 )
 from services.bot.domain.ports.output import (
     RepositoryPort,
@@ -352,3 +353,24 @@ class VoiceMessageUseCase(AbstractVoiceMessageUseCase):
             .bot
             .send_text(user.tg_id, msg)
         )
+
+
+class ErrorResponseUseCase(AbstractErrorResponseUseCase):
+    def __init__(
+        self,
+        repo: RepositoryPort,
+        locale: LocalePort,
+        bot: BotAPIPort,
+    ):
+        self.repo = repo
+        self.locale = locale
+        self.bot = bot
+
+    async def handle_error(self, tg_id: int):
+        user = await (
+            self
+            .repo
+            .get_user(tg_id)
+        )
+
+        await self.bot.send_text(tg_id, self.locale(user.language)("error"))
