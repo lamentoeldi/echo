@@ -25,6 +25,7 @@ from services.bot.application.usecases import (
 )
 from services.bot.domain.core import Core
 from services.bot.config import BotConfig
+from services.bot.infrastructure.metrics import MetricsServerConfig, MetricsServer
 
 import structlog
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -155,9 +156,13 @@ async def main():
         vm_uc=uc_vm
     )
 
+    metrics_cfg = MetricsServerConfig()
+    metrics = MetricsServer(cfg=metrics_cfg, log=log)
+
     await asyncio.gather(
         kafka_consumer.run(),
-        aiogram_controller.start_long_polling()
+        aiogram_controller.start_long_polling(),
+        metrics.start()
     )
 
 
