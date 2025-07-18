@@ -4,12 +4,13 @@ from services.bot.domain.ports.input import AbstractVoiceMessageUseCase
 
 from aiogram import Router, F, Bot
 from aiogram.types import Message
+from structlog.stdlib import BoundLogger
 
 vm_router = Router()
 
 
 @vm_router.message(F.voice)
-async def handle_vm(msg: Message, bot: Bot, uc_vm: AbstractVoiceMessageUseCase):
+async def handle_vm(msg: Message, bot: Bot, uc_vm: AbstractVoiceMessageUseCase, log: BoundLogger):
     f = await bot.get_file(msg.voice.file_id)
 
     stream = BytesIO()
@@ -17,3 +18,4 @@ async def handle_vm(msg: Message, bot: Bot, uc_vm: AbstractVoiceMessageUseCase):
 
     stream.seek(0)
     await uc_vm.start_vm_handling(msg.from_user.id, stream)
+    log.info("vm accepted")

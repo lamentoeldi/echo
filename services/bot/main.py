@@ -1,4 +1,7 @@
 import asyncio
+import logging
+import sys
+from logging import StreamHandler, DEBUG
 
 from services.bot.adapters.aiogram_controller import (
     AiogramConfig,
@@ -17,12 +20,52 @@ from services.bot.application.usecases import (
     HelpUseCase,
     SettingsUseCase,
     InvalidInputUseCase,
-    VoiceMessageUseCase
+    VoiceMessageUseCase,
+    ErrorResponseUseCase
 )
 from services.bot.domain.core import Core
 from services.bot.config import BotConfig
 
+import structlog
 from aiogram.fsm.storage.memory import MemoryStorage
+
+
+def setup_logger(
+    name: str = "main",
+    level: int = logging.INFO,
+    disable_other_loggers: bool = True
+) -> structlog.BoundLogger:
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.propagate = False
+
+    handler = StreamHandler(sys.stdout)
+    handler.setLevel(level)
+    handler.setFormatter(logging.Formatter("%(message)s"))
+    logger.handlers = [handler]
+
+    structlog.configure(
+        processors=[
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.stdlib.add_log_level,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.processors.JSONRenderer(),
+        ],
+        context_class=dict,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.make_filtering_bound_logger(level),
+        cache_logger_on_first_use=True,
+    )
+
+    if disable_other_loggers:
+        for other_name in logging.root.manager.loggerDict:
+            if not other_name.startswith(name):
+                other_logger = logging.getLogger(other_name)
+                other_logger.setLevel(logging.CRITICAL + 1)
+                other_logger.propagate = False
+
+    return structlog.get_logger(name)
 
 
 async def main():
@@ -82,21 +125,35 @@ async def main():
         broker=kafka_producer,
     )
 
+    uc_error = ErrorResponseUseCase(
+        repo=pg_repo,
+        locale=locale,
+        bot=bot,
+    )
+
     fsm_storage = MemoryStorage()
+
+    log = setup_logger(level=DEBUG)
 
     aiogram_cfg = AiogramConfig()
     aiogram_controller = AiogramController(
-        aiogram_cfg,
-        fsm_storage,
+        cfg=aiogram_cfg,
+        log=log,
+        fsm_storage=fsm_storage,
         uc_start=uc_start,
         uc_help=uc_help,
         uc_settings=uc_settings,
         uc_fallback=uc_fallback,
         uc_vm=uc_vm,
+        uc_error=uc_error,
     )
 
     kafka_consumer_cfg = KafkaConsumerConfig()
-    kafka_consumer = KafkaController(kafka_consumer_cfg, uc_vm)
+    kafka_consumer = KafkaController(
+        cfg=kafka_consumer_cfg,
+        log=log,
+        vm_uc=uc_vm
+    )
 
     await asyncio.gather(
         kafka_consumer.run(),

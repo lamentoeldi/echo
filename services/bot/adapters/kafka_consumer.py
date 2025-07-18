@@ -4,6 +4,7 @@ from services.bot.domain.models import AudioTranscribedMessage, AudioTranscribed
 from aiokafka import AIOKafkaConsumer, ConsumerRecord
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from structlog.stdlib import BoundLogger
 
 
 class KafkaConsumerConfig(BaseSettings):
@@ -16,8 +17,14 @@ class KafkaController:
     client: AIOKafkaConsumer
     cfg: KafkaConsumerConfig
 
-    def __init__(self, cfg: KafkaConsumerConfig, vm_uc: AbstractVoiceMessageUseCase):
+    def __init__(
+        self,
+        cfg: KafkaConsumerConfig,
+        log: BoundLogger,
+        vm_uc: AbstractVoiceMessageUseCase
+    ):
         self.cfg = cfg
+        self.log = log
         self.vm_uc = vm_uc
 
         topic = "audio_transcribed_tg"
@@ -34,6 +41,8 @@ class KafkaController:
             AudioTranscribedMessage
             .model_validate_json(msg.value)
         )
+
+        self.log.debug("handling message", message_id=transcription.content.id)
 
         if transcription.meta.status != "ok":
             await (
@@ -56,6 +65,8 @@ class KafkaController:
 
     async def run(self):
         try:
+            self.log.info("starting kafka consumer")
+
             await (
                 self
                 .client
@@ -71,6 +82,7 @@ class KafkaController:
                 )
 
         finally:
+            self.log.info("stopping kafka consumer")
             await (
                 self
                 .client
