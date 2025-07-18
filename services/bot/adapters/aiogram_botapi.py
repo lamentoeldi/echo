@@ -1,6 +1,6 @@
-from typing import Union
+from typing import Union, Optional
 
-from services.bot.domain.models import KeyboardMarkup
+from services.bot.domain.models import KeyboardMarkup, RemoveReplyKeyboard
 from services.bot.domain.ports.output import BotAPIPort
 
 from aiogram import Bot
@@ -8,7 +8,8 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
     ReplyKeyboardMarkup,
-    KeyboardButton as ReplyKeyboardButton
+    KeyboardButton as ReplyKeyboardButton,
+    ReplyKeyboardRemove
 )
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -63,8 +64,17 @@ class AiogramBotAPI(BotAPIPort):
         else:
             raise ValueError(f"Unknown keyboard type: {kb.type}")
 
-    async def send_text(self, user_id: int, text: str, keyboard: KeyboardMarkup = None):
-        kb = self._get_keyboard(keyboard) if keyboard else None
+    async def send_text(
+        self,
+        user_id: int,
+        text: str,
+        keyboard: Optional[Union[KeyboardMarkup, RemoveReplyKeyboard]] = None
+    ):
+        kb: Optional[Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None
+        if isinstance(keyboard, KeyboardMarkup):
+            kb = self._get_keyboard(keyboard)
+        if isinstance(keyboard, RemoveReplyKeyboard):
+            kb = ReplyKeyboardRemove()
 
         await (
             self

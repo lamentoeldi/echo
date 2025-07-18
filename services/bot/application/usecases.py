@@ -22,7 +22,8 @@ from services.bot.domain.ports.output import (
 from services.bot.domain.models import (
     UserUpdate,
     User,
-    AudioRawMessage
+    AudioRawMessage,
+    RemoveReplyKeyboard
 )
 from services.bot.config import BotConfig
 
@@ -221,7 +222,7 @@ class SettingsUseCase(AbstractSettingsUseCase):
             self
             .bot
             .send_text(
-                tg_id, self.locale(lang)("language_set")
+                tg_id, self.locale(lang)("language_set"), RemoveReplyKeyboard()
             )
         )
 

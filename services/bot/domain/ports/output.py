@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 from io import BytesIO
-from typing import Callable, Union
+from typing import Callable, Union, Optional
 
 from typing_extensions import overload
 
@@ -9,13 +9,13 @@ from ..models import (
     AudioRawMessage,
     User,
     UserUpdate,
-    KeyboardMarkup
+    KeyboardMarkup, RemoveReplyKeyboard
 )
 
 
 class BotAPIPort(ABC):
     @abstractmethod
-    async def send_text(self, user_id: int, text: str, keyboard: KeyboardMarkup = None):
+    async def send_text(self, user_id: int, text: str, keyboard: Optional[Union[KeyboardMarkup, RemoveReplyKeyboard]] = None):
         """
         Sends a text message to the user.
         :param user_id:

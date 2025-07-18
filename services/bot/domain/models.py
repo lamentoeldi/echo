@@ -80,3 +80,10 @@ class KeyboardMarkup(BaseModel):
     """
     type: Literal["inline", "reply"]
     buttons: List[List[KeyboardButton]]
+
+
+class RemoveReplyKeyboard:
+    """
+    Marks that reply keyboard should be removed
+    """
+    pass
