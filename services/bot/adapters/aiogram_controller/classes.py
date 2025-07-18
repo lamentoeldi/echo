@@ -5,18 +5,25 @@ from services.bot.domain.ports.input import (
     AbstractHelpUseCase,
     AbstractInvalidInputUseCase,
     AbstractSettingsUseCase,
-    AbstractVoiceMessageUseCase
+    AbstractVoiceMessageUseCase,
+    AbstractErrorResponseUseCase
 )
 from .start_router import start_router
 from .help_router import help_router
 from .fallback_router import fallback_router
 from .settings_router import settings_router
 from .vm_router import vm_router
+from .middleware import (
+    RequestIDMiddleware,
+    StructuredLoggerMiddleware,
+    ExceptionHandlerMiddleware
+)
 
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.base import BaseStorage
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings
+from structlog.stdlib import BoundLogger
 
 
 class AiogramConfig(BaseSettings):
@@ -26,7 +33,7 @@ class AiogramConfig(BaseSettings):
     webhook_url: Optional[str] = Field()
     webhook_secret: Optional[str] = Field()
 
-    @model_validator(mode="before")
+    @model_validator(mode="after")
     def validate_webhook_params(self) -> Self:
         if self.bot_api_mode == "long_polling":
             return self
@@ -42,13 +49,16 @@ class AiogramController:
     def __init__(
         self,
         cfg: AiogramConfig,
+        log: BoundLogger,
         fsm_storage: BaseStorage,
         uc_start: AbstractStartUseCase,
         uc_help: AbstractHelpUseCase,
         uc_fallback: AbstractInvalidInputUseCase,
         uc_settings: AbstractSettingsUseCase,
         uc_vm: AbstractVoiceMessageUseCase,
+        uc_error: AbstractErrorResponseUseCase,
     ):
+        self.log = log
         self.bot = Bot(cfg.bot_token)
         self.dp = Dispatcher(
             storage=fsm_storage,
@@ -66,5 +76,14 @@ class AiogramController:
             fallback_router,
         )
 
+        mw_request_id = RequestIDMiddleware()
+        mw_log = StructuredLoggerMiddleware(log)
+        mw_exception_handler = ExceptionHandlerMiddleware(uc_error)
+
+        self.dp.message.middleware(mw_request_id)
+        self.dp.message.middleware(mw_log)
+        self.dp.message.middleware(mw_exception_handler)
+
     async def start_long_polling(self):
+        self.log.info("starting bot api server")
         await self.dp.start_polling(self.bot)
