@@ -36,8 +36,8 @@ class AiogramConfig(BaseSettings):
     bot_api_mode: Literal["long_polling", "webhook"] = Field(default="long_polling")
 
     webhook_secret: Optional[str] = None
-    webhook_host: Optional[str] = None
-    webhook_port: Optional[int] = None
+    webhook_host: Optional[str] = Field(default="0.0.0.0")
+    webhook_port: Optional[int] = Field(default=8080)
 
     @model_validator(mode="after")
     def validate_webhook_params(self) -> Self:
@@ -49,6 +49,7 @@ class AiogramConfig(BaseSettings):
 
         if self.webhook_secret is None or self.webhook_host is None or self.webhook_port is None:
             raise ValueError("webhook params cannot be None in webhook mode")
+        return self
 
 
 class AiogramController:
@@ -111,12 +112,39 @@ class AiogramController:
         await self.mw_graceful_stop.wait()
 
     async def _start_webhook(self):
-        # to be implemented
-        pass
+        from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+        from aiohttp.web import Application, AppRunner, TCPSite
+
+        self._app = Application()
+
+        self._webhook_handler = SimpleRequestHandler(
+            dispatcher=self.dp,
+            bot=self.bot,
+            secret_token=self.cfg.webhook_secret
+        )
+        self._webhook_handler.register(self._app, path="/webhook")
+
+        setup_application(self._app, self.dp)
+
+        self.log.info(f"starting tg bot api webhook server on {self.cfg.webhook_host}:{self.cfg.webhook_port}")
+
+        self._runner = AppRunner(self._app)
+        await self._runner.setup()
+
+        self._site = TCPSite(
+            runner=self._runner,
+            host=self.cfg.webhook_host,
+            port=self.cfg.webhook_port
+        )
+        await self._site.start()
 
     async def _stop_webhook(self):
-        # to be implemented
-        pass
+        self.log.info("stopping tg bot api webhook server")
+        await self._site.stop()
+        await self._runner.shutdown()
+        await self._runner.cleanup()
+        await self.mw_graceful_stop.wait()
+        self.log.info("tg bot api webhook server stopped")
 
     async def start(self):
         if self.cfg.bot_api_mode == "long_polling":
