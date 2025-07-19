@@ -106,9 +106,12 @@ class KafkaController:
                 )
 
         finally:
-            self.log.info("stopping kafka consumer")
             await (
                 self
                 .client
                 .stop()
             )
+
+    async def stop(self):
+        self.log.info("stopping kafka consumer")
+        await self.client.stop()

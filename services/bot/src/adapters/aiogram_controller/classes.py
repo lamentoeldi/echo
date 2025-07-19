@@ -1,3 +1,4 @@
+import asyncio
 from typing import Literal, Optional, Self
 
 from domain.ports.input import (
@@ -18,7 +19,8 @@ from .middleware import (
     StructuredLoggerMiddleware,
     ExceptionHandlerMiddleware,
     BotRequestsCounterMiddleware,
-    BotLatencyMiddleware
+    BotLatencyMiddleware,
+    GracefulStopMiddleware
 )
 
 from aiogram import Dispatcher, Bot
@@ -78,18 +80,25 @@ class AiogramController:
             fallback_router,
         )
 
-        mw_request_id = RequestIDMiddleware()
-        mw_log = StructuredLoggerMiddleware(log)
-        mw_exception_handler = ExceptionHandlerMiddleware(uc_error)
-        mw_latency = BotLatencyMiddleware()
-        mw_request_counter = BotRequestsCounterMiddleware()
+        self.mw_graceful_stop = GracefulStopMiddleware()
+        self.mw_request_id = RequestIDMiddleware()
+        self.mw_log = StructuredLoggerMiddleware(log)
+        self.mw_exception_handler = ExceptionHandlerMiddleware(uc_error)
+        self.mw_latency = BotLatencyMiddleware()
+        self.mw_request_counter = BotRequestsCounterMiddleware()
 
-        self.dp.message.middleware(mw_request_id)
-        self.dp.message.middleware(mw_request_counter)
-        self.dp.message.middleware(mw_log)
-        self.dp.message.middleware(mw_exception_handler)
-        self.dp.message.middleware(mw_latency)
+        self.dp.message.middleware(self.mw_graceful_stop)
+        self.dp.message.middleware(self.mw_request_id)
+        self.dp.message.middleware(self.mw_request_counter)
+        self.dp.message.middleware(self.mw_log)
+        self.dp.message.middleware(self.mw_exception_handler)
+        self.dp.message.middleware(self.mw_latency)
 
     async def start_long_polling(self):
         self.log.info("starting bot api server")
         await self.dp.start_polling(self.bot)
+
+    async def stop_long_polling(self):
+        self.log.info("stopping bot api server")
+        await self.dp.stop_polling()
+        await self.mw_graceful_stop.wait()

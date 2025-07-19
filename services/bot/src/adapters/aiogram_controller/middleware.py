@@ -1,3 +1,4 @@
+import asyncio
 from typing import Callable, Dict, Awaitable, Any
 from time import time
 
@@ -24,6 +25,40 @@ bot_latency = Histogram(
     "bot response latency",
     buckets=_latency_buckets,
 )
+
+
+class GracefulStopMiddleware(BaseMiddleware):
+    """
+    Graceful stop middleware.
+    It is used to wait for all handlers to finish until stop.
+    """
+    def __init__(self):
+        self._counter = 0
+        self._lock = asyncio.Lock()
+        self._event = asyncio.Event()
+        self._event.set()
+
+    async def __call__(
+        self,
+        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        event: Message,
+        data: Dict[str, Any]
+    ) -> Any:
+        async with self._lock:
+            self._counter += 1
+            self._event.clear()
+        try:
+            return await handler(event, data)
+        finally:
+            async with self._lock:
+                self._counter -= 1
+                if self._counter == 0:
+                    self._event.set()
+                else:
+                    self._event.clear()
+
+    async def wait(self):
+        await self._event.wait()
 
 
 class BotLatencyMiddleware(BaseMiddleware):

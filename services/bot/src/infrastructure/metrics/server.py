@@ -70,3 +70,8 @@ class MetricsServer:
             port=self.cfg.port
         )
         await self._site.start()
+
+    async def stop(self):
+        await self._site.stop()
+        await self._runner.shutdown()
+        await self._runner.cleanup()

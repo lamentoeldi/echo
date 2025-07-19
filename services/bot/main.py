@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import sys
+from signal import SIGINT, SIGTERM
 from logging import StreamHandler, DEBUG
 
 from src.adapters import (
@@ -26,6 +27,7 @@ from src.application.usecases import (
 from src.domain.core import Core
 from src.config import BotConfig
 from src.infrastructure.metrics import MetricsServerConfig, MetricsServer
+from src.infrastructure.graceful_stop import GracefulStopper
 
 import structlog
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -159,10 +161,21 @@ async def main():
     metrics_cfg = MetricsServerConfig()
     metrics = MetricsServer(cfg=metrics_cfg, log=log)
 
+    stopper = GracefulStopper(
+        log=log,
+        signals=[SIGINT, SIGTERM],
+        callbacks=[
+            kafka_consumer.stop,
+            aiogram_controller.stop_long_polling,
+            metrics.stop,
+        ]
+    )
+
     await asyncio.gather(
         kafka_consumer.run(),
         aiogram_controller.start_long_polling(),
-        metrics.start()
+        metrics.start(),
+        stopper.run()
     )
 
 
