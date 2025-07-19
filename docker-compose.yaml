@@ -57,9 +57,18 @@ services:
       DEFAULT_LOCALE: en
 
       BOT_TOKEN: "${BOT_TOKEN}"
+      BOT_API_MODE: "webhook"
+      WEBHOOK_SECRET: "${WEBHOOK_SECRET}"
     depends_on:
       - postgres
       - s3
       - kafka
     ports:
       - '9090:9090'
+  ngrok:
+    image: ngrok/ngrok:latest
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    command: http --domain=${NGROK_BASE_URL} tg-bot:8080
+    depends_on:
+      - tg-bot
