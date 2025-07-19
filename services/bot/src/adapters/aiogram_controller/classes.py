@@ -1,4 +1,3 @@
-import asyncio
 from typing import Literal, Optional, Self
 
 from domain.ports.input import (
@@ -9,11 +8,13 @@ from domain.ports.input import (
     AbstractVoiceMessageUseCase,
     AbstractErrorResponseUseCase
 )
-from .start_router import start_router
-from .help_router import help_router
-from .fallback_router import fallback_router
-from .settings_router import settings_router
-from .vm_router import vm_router
+from .handlers import (
+    start_router,
+    help_router,
+    settings_router,
+    fallback_router,
+    vm_router
+)
 from .middleware import (
     RequestIDMiddleware,
     StructuredLoggerMiddleware,
