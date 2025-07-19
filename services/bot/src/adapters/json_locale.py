@@ -19,9 +19,10 @@ class JSONLocaleProvider(LocalePort):
                 self.locale[key] = data
 
     def __call__(self, locale: str) -> Callable[[str], str]:
-        locale_dict = self.locale[locale]
+        locale_dict = self.locale.get(locale, {})
+        default_locale_dict = self.locale.get("en", {})
 
         def locale_func(line: str) -> str:
-            return locale_dict[line]
+            return locale_dict.get(line) or default_locale_dict.get(line) or f"{line}_stub"
 
         return locale_func
