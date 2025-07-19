@@ -163,17 +163,21 @@ async def main():
 
     stopper = GracefulStopper(
         log=log,
-        signals=[SIGINT, SIGTERM],
+        signals=[
+            SIGINT,
+            SIGTERM
+        ],
         callbacks=[
             kafka_consumer.stop,
-            aiogram_controller.stop_long_polling,
+            aiogram_controller.stop,
             metrics.stop,
-        ]
+        ],
+        stop_timeout=bot_cfg.shutdown_timeout
     )
 
     await asyncio.gather(
         kafka_consumer.run(),
-        aiogram_controller.start_long_polling(),
+        aiogram_controller.start(),
         metrics.start(),
         stopper.run()
     )

@@ -35,19 +35,24 @@ class AiogramConfig(BaseSettings):
     bot_token: str = Field()
     bot_api_mode: Literal["long_polling", "webhook"] = Field(default="long_polling")
 
-    webhook_url: Optional[str] = None
     webhook_secret: Optional[str] = None
+    webhook_host: Optional[str] = None
+    webhook_port: Optional[int] = None
 
     @model_validator(mode="after")
     def validate_webhook_params(self) -> Self:
         if self.bot_api_mode == "long_polling":
             return self
 
-        if self.webhook_url is None or self.webhook_secret is None:
+        if self.bot_api_mode != "webhook":
+            raise ValueError("invalid bot api mode")
+
+        if self.webhook_secret is None or self.webhook_host is None or self.webhook_port is None:
             raise ValueError("webhook params cannot be None in webhook mode")
 
 
 class AiogramController:
+    cfg: AiogramConfig
     bot: Bot
     dp: Dispatcher
 
@@ -63,6 +68,7 @@ class AiogramController:
         uc_vm: AbstractVoiceMessageUseCase,
         uc_error: AbstractErrorResponseUseCase,
     ):
+        self.cfg = cfg
         self.log = log
         self.bot = Bot(cfg.bot_token)
         self.dp = Dispatcher(
@@ -95,11 +101,35 @@ class AiogramController:
         self.dp.message.middleware(self.mw_exception_handler)
         self.dp.message.middleware(self.mw_latency)
 
-    async def start_long_polling(self):
-        self.log.info("starting bot api server")
+    async def _start_long_polling(self):
+        self.log.info("starting tg bot api long polling")
         await self.dp.start_polling(self.bot)
 
-    async def stop_long_polling(self):
-        self.log.info("stopping bot api server")
+    async def _stop_long_polling(self):
+        self.log.info("stopping tg bot api long polling")
         await self.dp.stop_polling()
         await self.mw_graceful_stop.wait()
+
+    async def _start_webhook(self):
+        # to be implemented
+        pass
+
+    async def _stop_webhook(self):
+        # to be implemented
+        pass
+
+    async def start(self):
+        if self.cfg.bot_api_mode == "long_polling":
+            await self._start_long_polling()
+        elif self.cfg.bot_api_mode == "webhook":
+            await self._start_webhook()
+        else:
+            raise ValueError("bot_api_mode must be 'long_polling' or 'webhook'")
+
+    async def stop(self):
+        if self.cfg.bot_api_mode == "long_polling":
+            await self._stop_long_polling()
+        elif self.cfg.bot_api_mode == "webhook":
+            await self._stop_webhook()
+        else:
+            raise ValueError("bot_api_mode must be 'long_polling' or 'webhook'")
