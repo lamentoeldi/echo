@@ -1,0 +1,3 @@
+python-ffmpeg
+aiokafka
+aioboto3
