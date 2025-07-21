@@ -1,4 +1,4 @@
-python-ffmpeg
 aiokafka
 aioboto3
-pydantic
+pydantic~=2.11.7
+soundfile
