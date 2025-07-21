@@ -3,3 +3,5 @@ aioboto3
 pydantic~=2.11.7
 pydantic-settings
 soundfile
+structlog
+prometheus-client
