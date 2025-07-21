@@ -1,3 +1,4 @@
 python-ffmpeg
 aiokafka
 aioboto3
+pydantic
