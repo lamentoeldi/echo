@@ -41,8 +41,8 @@ Version: `0.1.0`
 - S3
 
 ## Audio Preprocessor
-Status: `unimplemented`<br/>
-Version: `-`
+Status: `implemented`<br/>
+Version: `0.1.0`
 
 ### This service:
 - Consumes [audio_raw](api/async/api.yaml) messages from [audio_raw](api/async/api.yaml) topic
@@ -54,6 +54,12 @@ Version: `-`
 - Uploads preprocessed voice messages back to object storage
 - Deletes raw audio messages from object storage
 - Produces [audio_preprocessed](api/async/api.yaml) messages to [audio_preprocessed](api/async/api.yaml) topic for further processing
+
+### Dependencies
+- Kafka
+- S3
+- SuX
+- ffmpeg
 
 ## Audio Transcriber
 Status: `unimplemented`<br/>
