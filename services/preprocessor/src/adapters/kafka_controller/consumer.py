@@ -46,7 +46,7 @@ class KafkaController:
         self.log = log
         self.pp_uc = pp_uc
 
-        topic = "audio_transcribed_tg"
+        topic = "audio_raw"
 
         self.client = AIOKafkaConsumer(
             topic,
