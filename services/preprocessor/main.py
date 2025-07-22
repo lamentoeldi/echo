@@ -2,12 +2,15 @@ import asyncio
 import logging
 import sys
 from logging import StreamHandler
+from signal import SIGINT, SIGTERM
 
 from src.adapters.kafka_controller.consumer import KafkaConsumerConfig, KafkaController
 from src.adapters.s3_storage import S3Config, S3StoragePort
 from src.adapters.kafka_message_bus import KafkaConfig, KafkaMessageBus
 from src.application.usecases import PreprocessUseCase
 from src.domain.core import Core
+from src.infrastructure.metrics import MetricsServerConfig, MetricsServer
+from src.infrastructure.graceful_stop import GracefulStopper
 
 import structlog
 
@@ -63,6 +66,9 @@ async def main():
 
     log = setup_logger()
 
+    metrics_cfg = MetricsServerConfig()
+    metrics = MetricsServer(metrics_cfg)
+
     kafka_cfg = KafkaConsumerConfig()
     kafka = KafkaController(
         cfg=kafka_cfg,
@@ -70,7 +76,20 @@ async def main():
         pp_uc=uc
     )
 
-    await kafka.run()
+    stop = GracefulStopper(
+        log=log,
+        callbacks=[
+            kafka.stop,
+            metrics.stop,
+        ],
+        signals=[SIGINT, SIGTERM],
+    )
+
+    await asyncio.gather(
+        kafka.run(),
+        metrics.start(),
+        stop.run(),
+    )
 
 if __name__ == '__main__':
     asyncio.run(main())

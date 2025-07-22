@@ -1,7 +1,9 @@
-aiokafka
-aioboto3
+aiokafka~=0.12.0
+aioboto3~=15.0.0
 pydantic~=2.11.7
-pydantic-settings
-soundfile
-structlog
+pydantic-settings~=2.10.1
+soundfile~=0.13.1
+structlog~=25.4.0
 prometheus-client
+prometheus_client~=0.22.1
+aiohttp~=3.12.14
