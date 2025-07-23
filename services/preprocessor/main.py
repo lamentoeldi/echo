@@ -67,7 +67,10 @@ async def main():
     log = setup_logger()
 
     metrics_cfg = MetricsServerConfig()
-    metrics = MetricsServer(metrics_cfg)
+    metrics = MetricsServer(
+        cfg=metrics_cfg,
+        log=log
+    )
 
     kafka_cfg = KafkaConsumerConfig()
     kafka = KafkaController(
