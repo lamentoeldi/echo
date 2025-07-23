@@ -12,15 +12,15 @@ from prometheus_client import Counter, Histogram
 _latency_buckets = [0.1, 0.5, 1.0, 1.5, 2.5, 5.0]
 
 kafka_consumed = Counter(
-    "ap_kafka_consumed",
+    "transcriber_kafka_consumed",
     "total amount of consumed messages",
 )
 kafka_errors = Counter(
-    "ap_kafka_errors",
+    "transcriber_kafka_errors",
     "total amount of kafka consumer errors",
 )
 kafka_latency = Histogram(
-    "ap_kafka_latency",
+    "transcriber_kafka_latency",
     "kafka response latency",
     buckets=_latency_buckets,
 )
@@ -46,7 +46,7 @@ class KafkaController:
         self.log = log
         self.ta_uc = ta_uc
 
-        topic = "audio_raw"
+        topic = "audio_preprocessed"
 
         self.client = AIOKafkaConsumer(
             topic,
