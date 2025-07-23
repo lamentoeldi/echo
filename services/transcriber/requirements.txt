@@ -3,6 +3,6 @@ aioboto3
 prometheus_client
 structlog
 aiohttp
-whisper
+openai-whisper
 pydantic
 pydantic-settings
