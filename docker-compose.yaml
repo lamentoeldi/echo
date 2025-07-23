@@ -89,3 +89,19 @@ services:
         condition: service_started
     ports:
       - '9090:9090'
+  audio-preprocessor:
+    image: preprocessor:0.1.0
+    build:
+      context: ./services/preprocessor
+    environment:
+      S3_ACCESS_KEY_ID: moonfire
+      S3_SECRET_ACCESS_KEY: moonfire
+      S3_URL: http://s3:9000
+
+      KAFKA_BOOTSTRAP_SERVERS: '["kafka:9092"]'
+      KAFKA_CONSUMER_GROUP: tg_bot
+    depends_on:
+      s3:
+        condition: service_healthy
+      kafka:
+        condition: service_started
