@@ -1,0 +1,6 @@
+aiokafka
+aioboto3
+prometheus_client
+structlog
+aiohttp
+whisper
