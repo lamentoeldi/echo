@@ -4,3 +4,5 @@ prometheus_client
 structlog
 aiohttp
 whisper
+pydantic
+pydantic-settings
