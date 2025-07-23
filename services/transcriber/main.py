@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import sys
+import warnings
 from logging import StreamHandler
 from signal import SIGINT, SIGTERM
 
@@ -25,6 +26,8 @@ def setup_logger(
     level: int = logging.INFO,
     disable_other_loggers: bool = True
 ) -> structlog.BoundLogger:
+    warnings.filterwarnings("ignore", category=UserWarning)
+
     logger = logging.getLogger(name)
     logger.setLevel(level)
     logger.propagate = False
