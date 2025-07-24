@@ -106,7 +106,7 @@ services:
       kafka:
         condition: service_started
   transcriber:
-    image: transcriber:0.1.0
+    image: transcriber:0.1.1
     build:
       context: ./services/transcriber
     environment:
