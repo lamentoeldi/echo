@@ -7,6 +7,8 @@ Description: Echo is a voice transcription platform
 - [Requirements](#requirements)
 - [General Architecture](#general-architecture)
   - [Telegram Bot Frontend](#telegram-bot-frontend)
+  - [Audio Preprocessor](#audio-preprocessor)
+  - [Audio Transcriber](#audio-transcriber)
 - [Scripts](#scripts)
   - [Set Webhook](#set-webhook)
   - [Delete Webhook](#delete-webhook)
@@ -40,6 +42,35 @@ Version: `0.1.0`
 - Kafka
 - S3
 
+### Configuration
+`S3_ACCESS_KEY_ID`: S3 Access Key ID (example: `moonfire`)
+
+`S3_SECRET_ACCESS_KEY`: S3 Secret Access Key (example: `moonfire`)
+
+`S3_URL`: S3 URL in [protocol://domain] format (example: `http://s3:9000`)
+
+`PG_HOST`: Postgres host (example: `postgres`)
+
+`PG_PORT`: Postgres port (example: `5432`)
+
+`PG_USER`: Postgres user (example: `postgres`)
+
+`PG_PASSWORD`: Postgres password (example: `postgres`)
+
+`PG_DB`: Postgres DB (example: `postgres`)
+
+`KAFKA_BOOTSTRAP_SERVERS`: Kafka bootstrap servers in ["host:port", "host:port"] format (example: ["kafka:9092"])
+
+`KAFKA_CONSUMER_GROUP`: Kafak consumer group to join (example: `tg_bot`)
+
+`DEFAULT_LOCALE`: Default locale language (example: `en`)
+
+`BOT_API_MODE`: Telegram Bot API connection mode: long_polling | webhook (default long_polling) (example: `webhook`)
+
+`BOT_TOKEN`: Telegram Bot API token (example: `7153357657:AFG613uy8BkBIskL8oGxQoDoJ-SC_Vs-Z3P`)
+
+`WEBHOOK_SECRET`: Telegram Bot API webhook secret token (set in webhook mode only) (example: `webhook-super-secret`)
+
 ## Audio Preprocessor
 Status: `implemented`<br/>
 Version: `0.1.0`
@@ -58,12 +89,23 @@ Version: `0.1.0`
 ### Dependencies
 - Kafka
 - S3
-- SuX
+- sox
 - ffmpeg
 
+### Configuration
+`S3_ACCESS_KEY_ID`: S3 Access Key ID (example: `moonfire`)
+
+`S3_SECRET_ACCESS_KEY`: S3 Secret Access Key (example: `moonfire`)
+
+`S3_URL`: S3 URL in [protocol://domain] format (example: `http://s3:9000`)
+
+`KAFKA_BOOTSTRAP_SERVERS`: Kafka bootstrap servers in ["host:port", "host:port"] format (example: ["kafka:9092"])
+
+`KAFKA_CONSUMER_GROUP`: Kafka consumer group to join (example: `preprocessor`)
+
 ## Audio Transcriber
-Status: `unimplemented`<br/>
-Version: `-`
+Status: `implemented`<br/>
+Version: `0.1.0`
 
 ### This service:
 - Consumes [audio_preprocessed](api/async/api.yaml) messages from [audio_preprocessed](api/async/api.yaml) topic
@@ -71,6 +113,23 @@ Version: `-`
 - Performs audio transcription (via extendable interface)
 - Deletes preprocessed voice messages from object storage
 - Produces [audio_transcribed](api/async/api.yaml) messages to corresponding topic based on source
+
+### Dependencies
+- Kafka
+- S3
+- ffmpeg
+- OpenAI Whisper
+
+### Configuration
+`S3_ACCESS_KEY_ID`: S3 Access Key ID (example: `moonfire`)
+
+`S3_SECRET_ACCESS_KEY`: S3 Secret Access Key (example: `moonfire`)
+
+`S3_URL`: S3 URL in [protocol://domain] format (example: `http://s3:9000`)
+
+`KAFKA_BOOTSTRAP_SERVERS`: Kafka bootstrap servers in ["host:port", "host:port"] format (example: ["kafka:9092"])
+
+`KAFKA_CONSUMER_GROUP`: Kafka consumer group to join (example: `transcriber`)
 
 # Scripts
 In this section you may find description of '.sh' and 'Makefile' scripts
