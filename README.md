@@ -65,11 +65,15 @@ Version: `0.1.0`
 
 `DEFAULT_LOCALE`: Default locale language (example: `en`)
 
-`BOT_API_MODE`: Telegram Bot API connection mode: long_polling | webhook (default long_polling) (example: `webhook`)
+`BOT_API_MODE`: Telegram Bot API connection mode: long_polling | webhook (default: `long_polling`, example: `webhook`)
 
 `BOT_TOKEN`: Telegram Bot API token (example: `7153357657:AFG613uy8BkBIskL8oGxQoDoJ-SC_Vs-Z3P`)
 
 `WEBHOOK_SECRET`: Telegram Bot API webhook secret token (set in webhook mode only) (example: `webhook-super-secret`)
+
+`METRICS_HOST`: Host to serve Prometheus metrics on (default: `0.0.0.0`, example: `0.0.0.0`)
+
+`METRICS_PORT`: Port to server Prometheus metrics on (default: `9090`, example: `9090`)
 
 ## Audio Preprocessor
 Status: `implemented`<br/>
@@ -103,9 +107,13 @@ Version: `0.1.0`
 
 `KAFKA_CONSUMER_GROUP`: Kafka consumer group to join (example: `preprocessor`)
 
+`METRICS_HOST`: Host to serve Prometheus metrics on (default: `0.0.0.0`, example: `0.0.0.0`)
+
+`METRICS_PORT`: Port to server Prometheus metrics on (default: `9090`, example: `9090`)
+
 ## Audio Transcriber
 Status: `implemented`<br/>
-Version: `0.1.0`
+Version: `0.1.1`
 
 ### This service:
 - Consumes [audio_preprocessed](api/async/api.yaml) messages from [audio_preprocessed](api/async/api.yaml) topic
@@ -130,6 +138,14 @@ Version: `0.1.0`
 `KAFKA_BOOTSTRAP_SERVERS`: Kafka bootstrap servers in ["host:port", "host:port"] format (example: ["kafka:9092"])
 
 `KAFKA_CONSUMER_GROUP`: Kafka consumer group to join (example: `transcriber`)
+
+`WHISPER_MODEL`: Whisper model ["tiny", "base", "small", "medium", "large"] (default: `base`, example: `base`)
+
+`WHISPER_MAX_WORKERS`: Maximum whisper calls executed in the same time (default: `1`, example: `1`)
+
+`METRICS_HOST`: Host to serve Prometheus metrics on (default: `0.0.0.0`, example: `0.0.0.0`)
+
+`METRICS_PORT`: Port to server Prometheus metrics on (default: `9090`, example: `9090`)
 
 # Scripts
 In this section you may find description of '.sh' and 'Makefile' scripts

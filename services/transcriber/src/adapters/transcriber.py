@@ -10,15 +10,15 @@ from pydantic_settings import BaseSettings
 
 
 class WhisperConfig(BaseSettings):
-    model: str = Field(default="base")
-    max_workers: int = Field(default=1)
+    whisper_model: str = Field(default="base")
+    whisper_max_workers: int = Field(default=1)
 
 
 class WhisperAudioTranscriberAdapter(AudioTranscriberPort):
     def __init__(self, cfg: WhisperConfig):
         self._cfg = cfg
-        self._model = load_model(self._cfg.model)
-        self._sem = asyncio.Semaphore(self._cfg.max_workers)
+        self._model = load_model(self._cfg.whisper_model)
+        self._sem = asyncio.Semaphore(self._cfg.whisper_max_workers)
 
     async def transcribe_audio(self, audio: BytesIO) -> str:
         audio.seek(0)
