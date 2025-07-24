@@ -1,4 +1,5 @@
 from time import time
+from asyncio import Semaphore
 
 from src.domain.ports.input import AbstractTranscribeAudioUseCase
 from src.domain.models import AudioPreprocessedMessage
@@ -29,12 +30,13 @@ kafka_latency = Histogram(
 class KafkaConsumerConfig(BaseSettings):
     kafka_bootstrap_servers: list[str] = Field()
     kafka_consumer_group: str = Field()
+    kafka_workers: int = Field(default=1)
 
 
 class KafkaController:
-    ta_uc: AbstractTranscribeAudioUseCase
-    client: AIOKafkaConsumer
-    cfg: KafkaConsumerConfig
+    _ta_uc: AbstractTranscribeAudioUseCase
+    _client: AIOKafkaConsumer
+    _cfg: KafkaConsumerConfig
 
     def __init__(
         self,
@@ -42,16 +44,16 @@ class KafkaController:
         log: BoundLogger,
         ta_uc: AbstractTranscribeAudioUseCase,
     ):
-        self.cfg = cfg
-        self.log = log
-        self.ta_uc = ta_uc
+        self._cfg = cfg
+        self._log = log
+        self._ta_uc = ta_uc
 
         topic = "audio_preprocessed"
 
-        self.client = AIOKafkaConsumer(
+        self._client = AIOKafkaConsumer(
             topic,
-            bootstrap_servers=self.cfg.kafka_bootstrap_servers,
-            group_id=self.cfg.kafka_consumer_group,
+            bootstrap_servers=self._cfg.kafka_bootstrap_servers,
+            group_id=self._cfg.kafka_consumer_group,
             enable_auto_commit=False,
         )
 
@@ -61,28 +63,28 @@ class KafkaController:
             .model_validate_json(msg.value)
         )
 
-        self.log.debug("handling message", message_id=md.content.id)
+        self._log.debug("handling message", message_id=md.content.id)
 
         if md.meta.status != "ok":
             raise RuntimeError("the fuck is the error")
 
         await (
             self
-            .ta_uc
+            ._ta_uc
             .transcribe_audio(md)
         )
 
     async def run(self):
         try:
-            self.log.info("starting kafka consumer")
+            self._log.info("starting kafka consumer")
 
             await (
                 self
-                .client
+                ._client
                 .start()
             )
 
-            async for msg in self.client:
+            async for msg in self._client:
                 kafka_consumed.inc()
                 start = time()
                 await self._handle_message(msg)
@@ -91,17 +93,17 @@ class KafkaController:
 
                 await (
                     self
-                    .client
+                    ._client
                     .commit()
                 )
 
         finally:
             await (
                 self
-                .client
+                ._client
                 .stop()
             )
 
     async def stop(self):
-        self.log.info("stopping kafka consumer")
-        await self.client.stop()
+        self._log.info("stopping kafka consumer")
+        await self._client.stop()

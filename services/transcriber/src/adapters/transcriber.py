@@ -1,3 +1,4 @@
+import asyncio
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 
@@ -10,12 +11,14 @@ from pydantic_settings import BaseSettings
 
 class WhisperConfig(BaseSettings):
     model: str = Field(default="base")
+    max_workers: int = Field(default=1)
 
 
 class WhisperAudioTranscriberAdapter(AudioTranscriberPort):
     def __init__(self, cfg: WhisperConfig):
-        self.cfg = cfg
-        self.model = load_model(self.cfg.model)
+        self._cfg = cfg
+        self._model = load_model(self._cfg.model)
+        self._sem = asyncio.Semaphore(self._cfg.max_workers)
 
     async def transcribe_audio(self, audio: BytesIO) -> str:
         audio.seek(0)
@@ -24,5 +27,8 @@ class WhisperAudioTranscriberAdapter(AudioTranscriberPort):
             f.write(audio.read())
             f.flush()
 
-            res = self.model.transcribe(audio=f.name)
+            async with self._sem:
+                loop = asyncio.get_event_loop()
+                res = await loop.run_in_executor(None, self._model.transcribe, f.name)
+
             return res["text"]
