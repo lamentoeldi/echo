@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from io import BytesIO
 
-from src.domain.models import AudioTranscribedMessage
+from src.domain.models import AudioTranscribedMessage, TranscribedAudio
 
 
 class StoragePort(ABC):
@@ -25,7 +25,7 @@ class MessageBusPort(ABC):
 
 class AudioTranscriberPort(ABC):
     @abstractmethod
-    async def transcribe_audio(self, audio: BytesIO) -> str:
+    async def transcribe_audio(self, audio: BytesIO) -> TranscribedAudio:
         """
         Transcribes an audio file
         :param audio:

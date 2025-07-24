@@ -3,6 +3,7 @@ from io import BytesIO
 from tempfile import NamedTemporaryFile
 
 from src.domain.ports.output import AudioTranscriberPort
+from src.domain.models import TranscribedAudio
 
 from whisper import load_model
 from pydantic import Field
@@ -31,4 +32,6 @@ class WhisperAudioTranscriberAdapter(AudioTranscriberPort):
                 loop = asyncio.get_event_loop()
                 res = await loop.run_in_executor(None, self._model.transcribe, f.name)
 
-            return res["text"]
+            return TranscribedAudio(
+                transcription=res["text"]
+            )
