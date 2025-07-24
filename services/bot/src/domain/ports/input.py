@@ -105,3 +105,13 @@ class AbstractErrorResponseUseCase(ABC):
         :param tg_id:
         :return:
         """
+
+
+class AbstractUserBlockedBotUseCase(ABC):
+    @abstractmethod
+    async def handle(self, tg_id: int):
+        """
+        Deletes user from system
+        :param tg_id:
+        :return:
+        """

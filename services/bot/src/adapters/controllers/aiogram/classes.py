@@ -6,14 +6,16 @@ from domain.ports.input import (
     AbstractInvalidInputUseCase,
     AbstractSettingsUseCase,
     AbstractVoiceMessageUseCase,
-    AbstractErrorResponseUseCase
+    AbstractErrorResponseUseCase,
+    AbstractUserBlockedBotUseCase
 )
 from .handlers import (
     start_router,
     help_router,
     settings_router,
     fallback_router,
-    vm_router
+    vm_router,
+    block_router
 )
 from .middleware import (
     RequestIDMiddleware,
@@ -68,6 +70,7 @@ class AiogramController:
         uc_settings: AbstractSettingsUseCase,
         uc_vm: AbstractVoiceMessageUseCase,
         uc_error: AbstractErrorResponseUseCase,
+        uc_block: AbstractUserBlockedBotUseCase
     ):
         self.cfg = cfg
         self.log = log
@@ -86,6 +89,7 @@ class AiogramController:
             settings_router,
             vm_router,
             fallback_router,
+            block_router
         )
 
         self.mw_graceful_stop = GracefulStopMiddleware()

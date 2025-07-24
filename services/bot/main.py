@@ -26,7 +26,8 @@ from src.application.usecases import (
     SettingsUseCase,
     InvalidInputUseCase,
     VoiceMessageUseCase,
-    ErrorResponseUseCase
+    ErrorResponseUseCase,
+    UserBlockedBotUseCase
 )
 from src.domain.core import Core
 from src.config import BotConfig
@@ -100,6 +101,10 @@ async def main():
         bot=bot,
     )
 
+    uc_block = UserBlockedBotUseCase(
+        repo=pg_repo,
+    )
+
     fsm_storage = MemoryStorage()
 
     log = setup_logger(level=DEBUG)
@@ -115,6 +120,7 @@ async def main():
         uc_fallback=uc_fallback,
         uc_vm=uc_vm,
         uc_error=uc_error,
+        uc_block=uc_block,
     )
 
     kafka_consumer_cfg = KafkaConsumerConfig()

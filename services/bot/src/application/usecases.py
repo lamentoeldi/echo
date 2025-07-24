@@ -9,7 +9,8 @@ from domain.ports.input import (
     AbstractSettingsUseCase,
     AbstractInvalidInputUseCase,
     AbstractVoiceMessageUseCase,
-    AbstractErrorResponseUseCase
+    AbstractErrorResponseUseCase,
+    AbstractUserBlockedBotUseCase
 )
 from domain.ports.output import (
     RepositoryPort,
@@ -26,6 +27,8 @@ from domain.models import (
     RemoveReplyKeyboard
 )
 from config import BotConfig
+
+from structlog.stdlib import BoundLogger
 
 
 class AbstractCore(ABC):
@@ -375,3 +378,14 @@ class ErrorResponseUseCase(AbstractErrorResponseUseCase):
         )
 
         await self.bot.send_text(tg_id, self.locale(user.language)("error"))
+
+
+class UserBlockedBotUseCase(AbstractUserBlockedBotUseCase):
+    def __init__(
+        self,
+        repo: RepositoryPort,
+    ):
+        self._repo = repo
+
+    async def handle(self, tg_id: int):
+        await self._repo.delete_user(tg_id)
