@@ -58,3 +58,4 @@ class TranscribeAudioUseCase(AbstractTranscribeAudioUseCase):
         )
 
         await self._broker.publish_md(msg)
+        await self._storage.delete_audio(filename)
