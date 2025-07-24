@@ -24,8 +24,8 @@ uptime = Gauge(
 
 
 class MetricsServerConfig(BaseSettings):
-    host: str = Field(default="0.0.0.0")
-    port: int = Field(default=9090)
+    metrics_host: str = Field(default="0.0.0.0")
+    metrics_port: int = Field(default=9090)
 
 
 class MetricsServer:
@@ -62,12 +62,12 @@ class MetricsServer:
     async def start(self):
         self._runner = AppRunner(self.app)
         await self._runner.setup()
-        self._site = TCPSite(self._runner, self.cfg.host, self.cfg.port)
+        self._site = TCPSite(self._runner, self.cfg.metrics_host, self.cfg.metrics_port)
 
         self.log.info(
             "starting metrics server",
-            host=self.cfg.host,
-            port=self.cfg.port
+            host=self.cfg.metrics_host,
+            port=self.cfg.metrics_port
         )
         await self._site.start()
 
