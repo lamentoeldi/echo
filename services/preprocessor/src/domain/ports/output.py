@@ -21,6 +21,14 @@ class StoragePort(ABC):
         :param filename:
         """
 
+    @abstractmethod
+    async def delete_audio(self, filename: str):
+        """
+        Deletes an audio file
+        :param filename:
+        :return:
+        """
+
 
 class MessageBusPort(ABC):
     @abstractmethod

@@ -43,3 +43,4 @@ class PreprocessUseCase(AbstractPreprocessUseCase):
         )
 
         await self.broker.publish_md(msg)
+        await self.storage.delete_audio(filename=filename)

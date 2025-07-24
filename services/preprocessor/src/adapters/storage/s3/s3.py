@@ -53,3 +53,14 @@ class S3StoragePort(StoragePort):
 
         stream.seek(0)
         return stream
+
+    async def delete_audio(self, filename: str):
+        sess = Session(
+            aws_access_key_id=self.config.s3_access_key_id,
+            aws_secret_access_key=self.config.s3_secret_access_key,
+            aws_session_token=self.config.s3_session_key,
+            region_name=self.config.s3_region,
+        )
+
+        async with sess.client("s3", endpoint_url=self.config.s3_url) as s3:
+            await s3.delete_object(self.input_bucket, filename)
