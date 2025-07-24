@@ -1,0 +1,8 @@
+aiokafka
+aioboto3
+prometheus_client
+structlog
+aiohttp
+openai-whisper
+pydantic
+pydantic-settings
