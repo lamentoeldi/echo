@@ -46,3 +46,7 @@ class AudioTranscribedMessage(BaseModel):
     meta: MessageMeta = Field()
     content: AudioTranscribed = Field()
     source: str = Field(exclude=True)
+
+
+class TranscribedAudio(BaseModel):
+    transcription: str = Field()

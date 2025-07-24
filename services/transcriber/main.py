@@ -1,64 +1,17 @@
 import asyncio
-import logging
-import sys
-import warnings
-from logging import StreamHandler
 from signal import SIGINT, SIGTERM
 
 from src.domain.core import Core
-from src.adapters import (
-    KafkaConfig, KafkaMessageBus,
-    KafkaController, KafkaConsumerConfig,
-    S3Config, S3StoragePort,
-    WhisperConfig, WhisperAudioTranscriberAdapter
-)
+from src.adapters.controllers import KafkaController, KafkaConsumerConfig
+from src.adapters.bus import KafkaConfig, KafkaMessageBus
+from src.adapters.storage import S3Config, S3StoragePort
+from src.adapters.transcriber import WhisperConfig, WhisperAudioTranscriberAdapter
 from src.infrastructure import (
     MetricsServerConfig, MetricsServer,
     GracefulStopper
 )
+from src.infrastructure.log import setup_logger
 from src.application import TranscribeAudioUseCase
-
-import structlog
-
-
-def setup_logger(
-    name: str = "main",
-    level: int = logging.INFO,
-    disable_other_loggers: bool = True
-) -> structlog.BoundLogger:
-    warnings.filterwarnings("ignore", category=UserWarning)
-
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    logger.propagate = False
-
-    handler = StreamHandler(sys.stdout)
-    handler.setLevel(level)
-    handler.setFormatter(logging.Formatter("%(message)s"))
-    logger.handlers = [handler]
-
-    structlog.configure(
-        processors=[
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.stdlib.add_log_level,
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
-            structlog.processors.JSONRenderer(),
-        ],
-        context_class=dict,
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        wrapper_class=structlog.make_filtering_bound_logger(level),
-        cache_logger_on_first_use=True,
-    )
-
-    if disable_other_loggers:
-        for other_name in logging.root.manager.loggerDict:
-            if not other_name.startswith(name):
-                other_logger = logging.getLogger(other_name)
-                other_logger.setLevel(logging.CRITICAL + 1)
-                other_logger.propagate = False
-
-    return structlog.get_logger(name)
 
 
 async def main():
