@@ -8,6 +8,7 @@ import (
 	pb "github.com/echo/tgdb/pkg/proto"
 	"github.com/echo/tgdb/pkg/protoutils"
 	"github.com/google/uuid"
+	"github.com/ilyakaznacheev/cleanenv"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -16,8 +17,18 @@ import (
 )
 
 type Config struct {
-	Host string `env:"GRPC_HOST" envDefault:"0.0.0.0"`
-	Port int    `env:"GRPC_PORT" envDefault:"50051"`
+	Host string `env:"GRPC_HOST" env-default:"0.0.0.0"`
+	Port int    `env:"GRPC_PORT" env-default:"50051"`
+}
+
+func NewConfig() (*Config, error) {
+	cfg := Config{}
+	err := cleanenv.ReadEnv(&cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return &cfg, nil
 }
 
 type Controller struct {
@@ -172,6 +183,11 @@ func (s *Controller) GetUserTgID(ctx context.Context, req *pb.GetUserTgIDRequest
 func (s *Controller) Run() {
 	go func() {
 		addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
+		s.log.Info(
+			"starting gRPC server",
+			zap.String("host", s.cfg.Host),
+			zap.Int("port", s.cfg.Port),
+		)
 		l, err := net.Listen("tcp", addr)
 		if err != nil {
 			s.log.Fatal("failed to listen", zap.Error(err))
