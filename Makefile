@@ -22,6 +22,15 @@ proto-go:
 				--grpc-gateway_out=./services/tgdb/pkg \
 				./api/proto/*.proto -I=./api/proto
 
+# Build python proto pb
+proto-python:
+	python \
+		-m grpc_tools.protoc \
+  		-I./api/proto \
+  		--python_out=./services/bot/src/adapters/repository/grpc \
+  		--grpc_python_out=./services/bot/src/adapters/repository/grpc \
+  		./api/proto/tgdb.proto
+
 # Build go mocks
 mock-go:
 	mockgen \

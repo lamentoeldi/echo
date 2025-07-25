@@ -922,7 +922,7 @@ var File_tgdb_proto protoreflect.FileDescriptor
 const file_tgdb_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"tgdb.proto\"\x94\x01\n" +
+	"tgdb.proto\x12\x04tgdb\"\x94\x01\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x13\n" +
 	"\x05tg_id\x18\x02 \x01(\x03R\x04tgId\x12$\n" +
@@ -931,32 +931,35 @@ const file_tgdb_proto_rawDesc = "" +
 	"\x04lang\x18\x04 \x01(\tR\x04lang\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x05 \x01(\x03R\tcreatedAtB\x0e\n" +
-	"\f_tg_username\".\n" +
-	"\x11CreateUserRequest\x12\x19\n" +
-	"\x04user\x18\x01 \x01(\v2\x05.UserR\x04user\"\x14\n" +
+	"\f_tg_username\"3\n" +
+	"\x11CreateUserRequest\x12\x1e\n" +
+	"\x04user\x18\x01 \x01(\v2\n" +
+	".tgdb.UserR\x04user\"\x14\n" +
 	"\x12CreateUserResponse\"$\n" +
 	"\x12GetUserByIDRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"0\n" +
-	"\x13GetUserByIDResponse\x12\x19\n" +
-	"\x04user\x18\x01 \x01(\v2\x05.UserR\x04user\"+\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"5\n" +
+	"\x13GetUserByIDResponse\x12\x1e\n" +
+	"\x04user\x18\x01 \x01(\v2\n" +
+	".tgdb.UserR\x04user\"+\n" +
 	"\x14GetUserByTgIDRequest\x12\x13\n" +
-	"\x05tg_id\x18\x01 \x01(\x03R\x04tgId\"2\n" +
-	"\x15GetUserByTgIDResponse\x12\x19\n" +
-	"\x04user\x18\x01 \x01(\v2\x05.UserR\x04user\"d\n" +
+	"\x05tg_id\x18\x01 \x01(\x03R\x04tgId\"7\n" +
+	"\x15GetUserByTgIDResponse\x12\x1e\n" +
+	"\x04user\x18\x01 \x01(\v2\n" +
+	".tgdb.UserR\x04user\"d\n" +
 	"\n" +
 	"UserUpdate\x12$\n" +
 	"\vtg_username\x18\x01 \x01(\tH\x00R\n" +
 	"tgUsername\x88\x01\x01\x12\x17\n" +
 	"\x04lang\x18\x02 \x01(\tH\x01R\x04lang\x88\x01\x01B\x0e\n" +
 	"\f_tg_usernameB\a\n" +
-	"\x05_lang\"L\n" +
+	"\x05_lang\"Q\n" +
 	"\x15UpdateUserByIDRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
-	"\x06update\x18\x02 \x01(\v2\v.UserUpdateR\x06update\"\x18\n" +
-	"\x16UpdateUserByIDResponse\"S\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12(\n" +
+	"\x06update\x18\x02 \x01(\v2\x10.tgdb.UserUpdateR\x06update\"\x18\n" +
+	"\x16UpdateUserByIDResponse\"X\n" +
 	"\x17UpdateUserByTgIDRequest\x12\x13\n" +
-	"\x05tg_id\x18\x01 \x01(\x03R\x04tgId\x12#\n" +
-	"\x06update\x18\x02 \x01(\v2\v.UserUpdateR\x06update\"\x1a\n" +
+	"\x05tg_id\x18\x01 \x01(\x03R\x04tgId\x12(\n" +
+	"\x06update\x18\x02 \x01(\v2\x10.tgdb.UserUpdateR\x06update\"\x1a\n" +
 	"\x18UpdateUserByTgIDResponse\"'\n" +
 	"\x15DeleteUserByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x18\n" +
@@ -971,18 +974,18 @@ const file_tgdb_proto_rawDesc = "" +
 	"\x12GetUserTgIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"*\n" +
 	"\x13GetUserTgIDResponse\x12\x13\n" +
-	"\x05tg_id\x18\x01 \x01(\x03R\x04tgId2\xbd\x04\n" +
-	"\x04TgDB\x125\n" +
+	"\x05tg_id\x18\x01 \x01(\x03R\x04tgId2\x97\x05\n" +
+	"\x04TgDB\x12?\n" +
 	"\n" +
-	"CreateUser\x12\x12.CreateUserRequest\x1a\x13.CreateUserResponse\x128\n" +
-	"\vGetUserByID\x12\x13.GetUserByIDRequest\x1a\x14.GetUserByIDResponse\x12>\n" +
-	"\rGetUserByTgID\x12\x15.GetUserByTgIDRequest\x1a\x16.GetUserByTgIDResponse\x12A\n" +
-	"\x0eUpdateUserByID\x12\x16.UpdateUserByIDRequest\x1a\x17.UpdateUserByIDResponse\x12G\n" +
-	"\x10UpdateUserByTgID\x12\x18.UpdateUserByTgIDRequest\x1a\x19.UpdateUserByTgIDResponse\x12A\n" +
-	"\x0eDeleteUserByID\x12\x16.DeleteUserByIDRequest\x1a\x17.DeleteUserByIDResponse\x12G\n" +
-	"\x10DeleteUserByTgID\x12\x18.DeleteUserByTgIDRequest\x1a\x19.DeleteUserByTgIDResponse\x122\n" +
-	"\tGetUserID\x12\x11.GetUserIDRequest\x1a\x12.GetUserIDResponse\x128\n" +
-	"\vGetUserTgID\x12\x13.GetUserTgIDRequest\x1a\x14.GetUserTgIDResponseB\tZ\a./protob\x06proto3"
+	"CreateUser\x12\x17.tgdb.CreateUserRequest\x1a\x18.tgdb.CreateUserResponse\x12B\n" +
+	"\vGetUserByID\x12\x18.tgdb.GetUserByIDRequest\x1a\x19.tgdb.GetUserByIDResponse\x12H\n" +
+	"\rGetUserByTgID\x12\x1a.tgdb.GetUserByTgIDRequest\x1a\x1b.tgdb.GetUserByTgIDResponse\x12K\n" +
+	"\x0eUpdateUserByID\x12\x1b.tgdb.UpdateUserByIDRequest\x1a\x1c.tgdb.UpdateUserByIDResponse\x12Q\n" +
+	"\x10UpdateUserByTgID\x12\x1d.tgdb.UpdateUserByTgIDRequest\x1a\x1e.tgdb.UpdateUserByTgIDResponse\x12K\n" +
+	"\x0eDeleteUserByID\x12\x1b.tgdb.DeleteUserByIDRequest\x1a\x1c.tgdb.DeleteUserByIDResponse\x12Q\n" +
+	"\x10DeleteUserByTgID\x12\x1d.tgdb.DeleteUserByTgIDRequest\x1a\x1e.tgdb.DeleteUserByTgIDResponse\x12<\n" +
+	"\tGetUserID\x12\x16.tgdb.GetUserIDRequest\x1a\x17.tgdb.GetUserIDResponse\x12B\n" +
+	"\vGetUserTgID\x12\x18.tgdb.GetUserTgIDRequest\x1a\x19.tgdb.GetUserTgIDResponseB\tZ\a./protob\x06proto3"
 
 var (
 	file_tgdb_proto_rawDescOnce sync.Once
@@ -998,51 +1001,51 @@ func file_tgdb_proto_rawDescGZIP() []byte {
 
 var file_tgdb_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_tgdb_proto_goTypes = []any{
-	(*User)(nil),                     // 0: User
-	(*CreateUserRequest)(nil),        // 1: CreateUserRequest
-	(*CreateUserResponse)(nil),       // 2: CreateUserResponse
-	(*GetUserByIDRequest)(nil),       // 3: GetUserByIDRequest
-	(*GetUserByIDResponse)(nil),      // 4: GetUserByIDResponse
-	(*GetUserByTgIDRequest)(nil),     // 5: GetUserByTgIDRequest
-	(*GetUserByTgIDResponse)(nil),    // 6: GetUserByTgIDResponse
-	(*UserUpdate)(nil),               // 7: UserUpdate
-	(*UpdateUserByIDRequest)(nil),    // 8: UpdateUserByIDRequest
-	(*UpdateUserByIDResponse)(nil),   // 9: UpdateUserByIDResponse
-	(*UpdateUserByTgIDRequest)(nil),  // 10: UpdateUserByTgIDRequest
-	(*UpdateUserByTgIDResponse)(nil), // 11: UpdateUserByTgIDResponse
-	(*DeleteUserByIDRequest)(nil),    // 12: DeleteUserByIDRequest
-	(*DeleteUserByIDResponse)(nil),   // 13: DeleteUserByIDResponse
-	(*DeleteUserByTgIDRequest)(nil),  // 14: DeleteUserByTgIDRequest
-	(*DeleteUserByTgIDResponse)(nil), // 15: DeleteUserByTgIDResponse
-	(*GetUserIDRequest)(nil),         // 16: GetUserIDRequest
-	(*GetUserIDResponse)(nil),        // 17: GetUserIDResponse
-	(*GetUserTgIDRequest)(nil),       // 18: GetUserTgIDRequest
-	(*GetUserTgIDResponse)(nil),      // 19: GetUserTgIDResponse
+	(*User)(nil),                     // 0: tgdb.User
+	(*CreateUserRequest)(nil),        // 1: tgdb.CreateUserRequest
+	(*CreateUserResponse)(nil),       // 2: tgdb.CreateUserResponse
+	(*GetUserByIDRequest)(nil),       // 3: tgdb.GetUserByIDRequest
+	(*GetUserByIDResponse)(nil),      // 4: tgdb.GetUserByIDResponse
+	(*GetUserByTgIDRequest)(nil),     // 5: tgdb.GetUserByTgIDRequest
+	(*GetUserByTgIDResponse)(nil),    // 6: tgdb.GetUserByTgIDResponse
+	(*UserUpdate)(nil),               // 7: tgdb.UserUpdate
+	(*UpdateUserByIDRequest)(nil),    // 8: tgdb.UpdateUserByIDRequest
+	(*UpdateUserByIDResponse)(nil),   // 9: tgdb.UpdateUserByIDResponse
+	(*UpdateUserByTgIDRequest)(nil),  // 10: tgdb.UpdateUserByTgIDRequest
+	(*UpdateUserByTgIDResponse)(nil), // 11: tgdb.UpdateUserByTgIDResponse
+	(*DeleteUserByIDRequest)(nil),    // 12: tgdb.DeleteUserByIDRequest
+	(*DeleteUserByIDResponse)(nil),   // 13: tgdb.DeleteUserByIDResponse
+	(*DeleteUserByTgIDRequest)(nil),  // 14: tgdb.DeleteUserByTgIDRequest
+	(*DeleteUserByTgIDResponse)(nil), // 15: tgdb.DeleteUserByTgIDResponse
+	(*GetUserIDRequest)(nil),         // 16: tgdb.GetUserIDRequest
+	(*GetUserIDResponse)(nil),        // 17: tgdb.GetUserIDResponse
+	(*GetUserTgIDRequest)(nil),       // 18: tgdb.GetUserTgIDRequest
+	(*GetUserTgIDResponse)(nil),      // 19: tgdb.GetUserTgIDResponse
 }
 var file_tgdb_proto_depIdxs = []int32{
-	0,  // 0: CreateUserRequest.user:type_name -> User
-	0,  // 1: GetUserByIDResponse.user:type_name -> User
-	0,  // 2: GetUserByTgIDResponse.user:type_name -> User
-	7,  // 3: UpdateUserByIDRequest.update:type_name -> UserUpdate
-	7,  // 4: UpdateUserByTgIDRequest.update:type_name -> UserUpdate
-	1,  // 5: TgDB.CreateUser:input_type -> CreateUserRequest
-	3,  // 6: TgDB.GetUserByID:input_type -> GetUserByIDRequest
-	5,  // 7: TgDB.GetUserByTgID:input_type -> GetUserByTgIDRequest
-	8,  // 8: TgDB.UpdateUserByID:input_type -> UpdateUserByIDRequest
-	10, // 9: TgDB.UpdateUserByTgID:input_type -> UpdateUserByTgIDRequest
-	12, // 10: TgDB.DeleteUserByID:input_type -> DeleteUserByIDRequest
-	14, // 11: TgDB.DeleteUserByTgID:input_type -> DeleteUserByTgIDRequest
-	16, // 12: TgDB.GetUserID:input_type -> GetUserIDRequest
-	18, // 13: TgDB.GetUserTgID:input_type -> GetUserTgIDRequest
-	2,  // 14: TgDB.CreateUser:output_type -> CreateUserResponse
-	4,  // 15: TgDB.GetUserByID:output_type -> GetUserByIDResponse
-	6,  // 16: TgDB.GetUserByTgID:output_type -> GetUserByTgIDResponse
-	9,  // 17: TgDB.UpdateUserByID:output_type -> UpdateUserByIDResponse
-	11, // 18: TgDB.UpdateUserByTgID:output_type -> UpdateUserByTgIDResponse
-	13, // 19: TgDB.DeleteUserByID:output_type -> DeleteUserByIDResponse
-	15, // 20: TgDB.DeleteUserByTgID:output_type -> DeleteUserByTgIDResponse
-	17, // 21: TgDB.GetUserID:output_type -> GetUserIDResponse
-	19, // 22: TgDB.GetUserTgID:output_type -> GetUserTgIDResponse
+	0,  // 0: tgdb.CreateUserRequest.user:type_name -> tgdb.User
+	0,  // 1: tgdb.GetUserByIDResponse.user:type_name -> tgdb.User
+	0,  // 2: tgdb.GetUserByTgIDResponse.user:type_name -> tgdb.User
+	7,  // 3: tgdb.UpdateUserByIDRequest.update:type_name -> tgdb.UserUpdate
+	7,  // 4: tgdb.UpdateUserByTgIDRequest.update:type_name -> tgdb.UserUpdate
+	1,  // 5: tgdb.TgDB.CreateUser:input_type -> tgdb.CreateUserRequest
+	3,  // 6: tgdb.TgDB.GetUserByID:input_type -> tgdb.GetUserByIDRequest
+	5,  // 7: tgdb.TgDB.GetUserByTgID:input_type -> tgdb.GetUserByTgIDRequest
+	8,  // 8: tgdb.TgDB.UpdateUserByID:input_type -> tgdb.UpdateUserByIDRequest
+	10, // 9: tgdb.TgDB.UpdateUserByTgID:input_type -> tgdb.UpdateUserByTgIDRequest
+	12, // 10: tgdb.TgDB.DeleteUserByID:input_type -> tgdb.DeleteUserByIDRequest
+	14, // 11: tgdb.TgDB.DeleteUserByTgID:input_type -> tgdb.DeleteUserByTgIDRequest
+	16, // 12: tgdb.TgDB.GetUserID:input_type -> tgdb.GetUserIDRequest
+	18, // 13: tgdb.TgDB.GetUserTgID:input_type -> tgdb.GetUserTgIDRequest
+	2,  // 14: tgdb.TgDB.CreateUser:output_type -> tgdb.CreateUserResponse
+	4,  // 15: tgdb.TgDB.GetUserByID:output_type -> tgdb.GetUserByIDResponse
+	6,  // 16: tgdb.TgDB.GetUserByTgID:output_type -> tgdb.GetUserByTgIDResponse
+	9,  // 17: tgdb.TgDB.UpdateUserByID:output_type -> tgdb.UpdateUserByIDResponse
+	11, // 18: tgdb.TgDB.UpdateUserByTgID:output_type -> tgdb.UpdateUserByTgIDResponse
+	13, // 19: tgdb.TgDB.DeleteUserByID:output_type -> tgdb.DeleteUserByIDResponse
+	15, // 20: tgdb.TgDB.DeleteUserByTgID:output_type -> tgdb.DeleteUserByTgIDResponse
+	17, // 21: tgdb.TgDB.GetUserID:output_type -> tgdb.GetUserIDResponse
+	19, // 22: tgdb.TgDB.GetUserTgID:output_type -> tgdb.GetUserTgIDResponse
 	14, // [14:23] is the sub-list for method output_type
 	5,  // [5:14] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name

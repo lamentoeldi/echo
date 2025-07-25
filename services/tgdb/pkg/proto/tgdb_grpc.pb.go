@@ -19,15 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TgDB_CreateUser_FullMethodName       = "/TgDB/CreateUser"
-	TgDB_GetUserByID_FullMethodName      = "/TgDB/GetUserByID"
-	TgDB_GetUserByTgID_FullMethodName    = "/TgDB/GetUserByTgID"
-	TgDB_UpdateUserByID_FullMethodName   = "/TgDB/UpdateUserByID"
-	TgDB_UpdateUserByTgID_FullMethodName = "/TgDB/UpdateUserByTgID"
-	TgDB_DeleteUserByID_FullMethodName   = "/TgDB/DeleteUserByID"
-	TgDB_DeleteUserByTgID_FullMethodName = "/TgDB/DeleteUserByTgID"
-	TgDB_GetUserID_FullMethodName        = "/TgDB/GetUserID"
-	TgDB_GetUserTgID_FullMethodName      = "/TgDB/GetUserTgID"
+	TgDB_CreateUser_FullMethodName       = "/tgdb.TgDB/CreateUser"
+	TgDB_GetUserByID_FullMethodName      = "/tgdb.TgDB/GetUserByID"
+	TgDB_GetUserByTgID_FullMethodName    = "/tgdb.TgDB/GetUserByTgID"
+	TgDB_UpdateUserByID_FullMethodName   = "/tgdb.TgDB/UpdateUserByID"
+	TgDB_UpdateUserByTgID_FullMethodName = "/tgdb.TgDB/UpdateUserByTgID"
+	TgDB_DeleteUserByID_FullMethodName   = "/tgdb.TgDB/DeleteUserByID"
+	TgDB_DeleteUserByTgID_FullMethodName = "/tgdb.TgDB/DeleteUserByTgID"
+	TgDB_GetUserID_FullMethodName        = "/tgdb.TgDB/GetUserID"
+	TgDB_GetUserTgID_FullMethodName      = "/tgdb.TgDB/GetUserTgID"
 )
 
 // TgDBClient is the client API for TgDB service.
@@ -380,7 +380,7 @@ func _TgDB_GetUserTgID_Handler(srv interface{}, ctx context.Context, dec func(in
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TgDB_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "TgDB",
+	ServiceName: "tgdb.TgDB",
 	HandlerType: (*TgDBServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
