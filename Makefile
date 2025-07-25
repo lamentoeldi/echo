@@ -14,3 +14,10 @@ set-webhook:
 delete-webhook:
 	@echo "❌ Deleting webhook..."
 	@$(SCRIPTS_DIR)/delete_webhook.sh
+
+# Build go proto pb
+proto-go:
+	protoc --go_out=./services/tgdb/pkg \
+				--go-grpc_out=./services/tgdb/pkg \
+				--grpc-gateway_out=./services/tgdb/pkg \
+				./api/proto/*.proto -I=./api/proto
