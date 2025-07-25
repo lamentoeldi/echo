@@ -86,10 +86,18 @@ func (uc *UseCases) GetUserByTgID(ctx context.Context, id int64) (*models.User, 
 }
 
 func (uc *UseCases) UpdateUserByID(ctx context.Context, id uuid.UUID, update *models.UserUpdate) error {
-	err := uc.userRepo.UpdateByID(ctx, id, update)
+	tgID, err := uc.GetUserTgID(ctx, id)
 	if err != nil {
 		return err
 	}
+
+	err = uc.userRepo.UpdateByID(ctx, id, update)
+	if err != nil {
+		return err
+	}
+
+	err = uc.userCache.InvalidateUserByTgID(ctx, tgID)
+	logCacheError(ctx, err)
 
 	err = uc.userCache.InvalidateUserByID(ctx, id)
 	logCacheError(ctx, err)
@@ -98,10 +106,18 @@ func (uc *UseCases) UpdateUserByID(ctx context.Context, id uuid.UUID, update *mo
 }
 
 func (uc *UseCases) UpdateUserByTgID(ctx context.Context, id int64, update *models.UserUpdate) error {
-	err := uc.userRepo.UpdateByTgID(ctx, id, update)
+	uid, err := uc.GetUserID(ctx, id)
 	if err != nil {
 		return err
 	}
+
+	err = uc.userRepo.UpdateByTgID(ctx, id, update)
+	if err != nil {
+		return err
+	}
+
+	err = uc.userCache.InvalidateUserByID(ctx, uid)
+	logCacheError(ctx, err)
 
 	err = uc.userCache.InvalidateUserByTgID(ctx, id)
 	logCacheError(ctx, err)
@@ -110,10 +126,18 @@ func (uc *UseCases) UpdateUserByTgID(ctx context.Context, id int64, update *mode
 }
 
 func (uc *UseCases) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
-	err := uc.userRepo.DeleteByID(ctx, id)
+	tgID, err := uc.GetUserTgID(ctx, id)
 	if err != nil {
 		return err
 	}
+
+	err = uc.userRepo.DeleteByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	err = uc.userCache.InvalidateUserByTgID(ctx, tgID)
+	logCacheError(ctx, err)
 
 	err = uc.userCache.InvalidateUserByID(ctx, id)
 	logCacheError(ctx, err)
@@ -122,10 +146,18 @@ func (uc *UseCases) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 }
 
 func (uc *UseCases) DeleteUserByTgID(ctx context.Context, id int64) error {
-	err := uc.userRepo.DeleteByTgID(ctx, id)
+	uid, err := uc.GetUserID(ctx, id)
 	if err != nil {
 		return err
 	}
+
+	err = uc.userRepo.DeleteByTgID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	err = uc.userCache.InvalidateUserByID(ctx, uid)
+	logCacheError(ctx, err)
 
 	err = uc.userCache.InvalidateUserByTgID(ctx, id)
 	logCacheError(ctx, err)
