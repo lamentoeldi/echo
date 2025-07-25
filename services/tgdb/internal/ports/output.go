@@ -21,10 +21,19 @@ type UserQueryPort interface {
 	GetTgID(ctx context.Context, id uuid.UUID) (int64, error)
 }
 
+type UserRepoPort interface {
+	UserCommandPort
+	UserQueryPort
+}
+
 type UserCachePort interface {
 	UserQueryPort
+	// InvalidateUserID deletes uuid -> int entry
 	InvalidateUserID(ctx context.Context, id uuid.UUID) error
+	// InvalidateUserByID deletes uuid -> models.User entry
 	InvalidateUserByID(ctx context.Context, id uuid.UUID) error
+	// InvalidateUserTgID deletes int -> uuid entry
 	InvalidateUserTgID(ctx context.Context, id int64) error
+	// InvalidateUserByTgID deletes int -> models.User entry
 	InvalidateUserByTgID(ctx context.Context, id int64) error
 }
