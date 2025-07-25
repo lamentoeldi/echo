@@ -12,8 +12,8 @@ from pydantic_settings import BaseSettings
 
 
 class TgDBRepoConfig(BaseSettings):
-    host: str = Field(default="tgdb")
-    port: int = Field(default=50051)
+    tgdb_host: str = Field(default="tgdb")
+    tgdb_port: int = Field(default=50051)
 
 
 class TgDBRepo(RepositoryPort):
