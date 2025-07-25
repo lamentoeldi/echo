@@ -142,6 +142,12 @@ func (uc *UseCases) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 	err = uc.userCache.InvalidateUserByID(ctx, id)
 	logCacheError(ctx, err)
 
+	err = uc.userCache.InvalidateUserID(ctx, id)
+	logCacheError(ctx, err)
+
+	err = uc.userCache.InvalidateUserTgID(ctx, tgID)
+	logCacheError(ctx, err)
+
 	return nil
 }
 
@@ -160,6 +166,12 @@ func (uc *UseCases) DeleteUserByTgID(ctx context.Context, id int64) error {
 	logCacheError(ctx, err)
 
 	err = uc.userCache.InvalidateUserByTgID(ctx, id)
+	logCacheError(ctx, err)
+
+	err = uc.userCache.InvalidateUserID(ctx, uid)
+	logCacheError(ctx, err)
+
+	err = uc.userCache.InvalidateUserTgID(ctx, id)
 	logCacheError(ctx, err)
 
 	return nil
