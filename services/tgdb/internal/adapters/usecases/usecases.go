@@ -36,7 +36,15 @@ func New(userRepo ports.UserRepoPort, userCache ports.UserCachePort) (*UseCases,
 }
 
 func (uc *UseCases) CreateUser(ctx context.Context, user *models.User) error {
-	return uc.userRepo.Add(ctx, user)
+	err := uc.userRepo.Add(ctx, user)
+	if err != nil {
+		return err
+	}
+
+	err = uc.userCache.AddByTgID(ctx, user)
+	logCacheError(ctx, err)
+
+	return nil
 }
 
 func (uc *UseCases) GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
@@ -47,7 +55,15 @@ func (uc *UseCases) GetUserByID(ctx context.Context, id uuid.UUID) (*models.User
 		return user, nil
 	}
 
-	return uc.userRepo.GetByID(ctx, id)
+	user, err = uc.userRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = uc.userCache.AddByID(ctx, user)
+	logCacheError(ctx, err)
+
+	return user, nil
 }
 
 func (uc *UseCases) GetUserByTgID(ctx context.Context, id int64) (*models.User, error) {
@@ -58,7 +74,15 @@ func (uc *UseCases) GetUserByTgID(ctx context.Context, id int64) (*models.User, 
 		return user, nil
 	}
 
-	return uc.userRepo.GetByTgID(ctx, id)
+	user, err = uc.userRepo.GetByTgID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = uc.userCache.AddByTgID(ctx, user)
+	logCacheError(ctx, err)
+
+	return user, nil
 }
 
 func (uc *UseCases) UpdateUserByID(ctx context.Context, id uuid.UUID, update *models.UserUpdate) error {
@@ -117,7 +141,15 @@ func (uc *UseCases) GetUserID(ctx context.Context, id int64) (uuid.UUID, error) 
 		return uid, nil
 	}
 
-	return uc.userRepo.GetID(ctx, id)
+	uid, err = uc.userRepo.GetID(ctx, id)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	err = uc.userCache.AddID(ctx, id, uid)
+	logCacheError(ctx, err)
+
+	return uid, nil
 }
 
 func (uc *UseCases) GetUserTgID(ctx context.Context, id uuid.UUID) (int64, error) {
@@ -128,5 +160,13 @@ func (uc *UseCases) GetUserTgID(ctx context.Context, id uuid.UUID) (int64, error
 		return tgID, nil
 	}
 
-	return uc.userRepo.GetTgID(ctx, id)
+	tgID, err = uc.userRepo.GetTgID(ctx, id)
+	if err != nil {
+		return 0, err
+	}
+
+	err = uc.userCache.AddTgID(ctx, id, tgID)
+	logCacheError(ctx, err)
+
+	return tgID, nil
 }
