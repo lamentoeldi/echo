@@ -27,7 +27,7 @@ This projects implements MSA and consists of the following services
 
 ## Telegram Bot Frontend
 Status: `implemented`<br/>
-Version: `0.1.0`
+Version: `0.1.2`
 
 ### This service:
 - Manages telegram user accounts
@@ -49,15 +49,9 @@ Version: `0.1.0`
 
 `S3_URL`: S3 URL in [protocol://domain] format (example: `http://s3:9000`)
 
-`PG_HOST`: Postgres host (example: `postgres`)
+`TGDB_HOST`: tgdb host
 
-`PG_PORT`: Postgres port (example: `5432`)
-
-`PG_USER`: Postgres user (example: `postgres`)
-
-`PG_PASSWORD`: Postgres password (example: `postgres`)
-
-`PG_DB`: Postgres DB (example: `postgres`)
+`TGDB_PORT`: tgdb port
 
 `KAFKA_BOOTSTRAP_SERVERS`: Kafka bootstrap servers in ["host:port", "host:port"] format (example: ["kafka:9092"])
 
@@ -74,6 +68,43 @@ Version: `0.1.0`
 `METRICS_HOST`: Host to serve Prometheus metrics on (default: `0.0.0.0`, example: `0.0.0.0`)
 
 `METRICS_PORT`: Port to server Prometheus metrics on (default: `9090`, example: `9090`)
+
+## tgdb
+Status: `implemented`<br/>
+Version: `0.1.0`
+
+This service:
+- Manages tg bot db and cache
+- Provides reliable and performant data accsess API
+
+### Dependencies
+- Postgres
+- Redis
+
+### Configuration
+`GRPC_HOST`: gRPC host (default: `0.0.0.0`)
+
+`GRPC_PORT`: gRPC port (default: `50051`)
+
+`POSTGRES_HOST`: Postgres host (example: `postgres`)
+
+`POSTGRES_PORT`: Postgres port (example: `5432`)
+
+`POSTGRES_USER`: Postgres user (example: `postgres`)
+
+`POSTGRES_PASSWORD`: Postgres password (example: `postgres`)
+
+`POSTGRES_DB`: Postgres db (example: `postgres`)
+
+`REDIS_HOST`: Redis host (example: `redis`)
+
+`REDIS_PORT`: Redis port (example: `6379`)
+
+`REDIS_USER`: Redis user (example: `default`)
+
+`REDIS_PASSWORD`: Redis password
+
+`REDIS_DB`: Redis db (default: `0`)
 
 ## Audio Preprocessor
 Status: `implemented`<br/>

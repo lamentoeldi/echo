@@ -87,7 +87,7 @@ services:
     ports:
       - '50051:50051'
   tg-bot:
-    image: bot:0.1.0
+    image: bot:0.1.2
     build:
       context: ./services/bot
     environment:
@@ -95,11 +95,8 @@ services:
       S3_SECRET_ACCESS_KEY: moonfire
       S3_URL: http://s3:9000
 
-      PG_HOST: postgres
-      PG_PORT: 5432
-      PG_USER: postgres
-      PG_PASSWORD: postgres
-      PG_DB: postgres
+      TGDB_HOST: tgdb
+      TGDB_PORT: 50051
 
       KAFKA_BOOTSTRAP_SERVERS: '["kafka:9092"]'
       KAFKA_CONSUMER_GROUP: tg_bot
@@ -110,8 +107,8 @@ services:
       BOT_API_MODE: "webhook"
       WEBHOOK_SECRET: "${WEBHOOK_SECRET}"
     depends_on:
-      postgres:
-        condition: service_healthy
+      tgdb:
+        condition: service_started
       s3:
         condition: service_healthy
       kafka:
