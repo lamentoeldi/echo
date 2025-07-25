@@ -21,3 +21,14 @@ proto-go:
 				--go-grpc_out=./services/tgdb/pkg \
 				--grpc-gateway_out=./services/tgdb/pkg \
 				./api/proto/*.proto -I=./api/proto
+
+# Build go mocks
+mock-go:
+	mockgen \
+		-source=./services/tgdb/internal/ports/input.go \
+		-destination=./services/tgdb/pkg/mock/mock_input.go \
+		-package=mock
+	mockgen \
+    		-source=./services/tgdb/internal/ports/output.go \
+    		-destination=./services/tgdb/pkg/mock/mock_output.go \
+    		-package=mock
