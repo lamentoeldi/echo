@@ -18,32 +18,32 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockUserCommandPort is a mock of UserCommandPort interface.
-type MockUserCommandPort struct {
+// MockUserCommand is a mock of UserCommand interface.
+type MockUserCommand struct {
 	ctrl     *gomock.Controller
-	recorder *MockUserCommandPortMockRecorder
+	recorder *MockUserCommandMockRecorder
 	isgomock struct{}
 }
 
-// MockUserCommandPortMockRecorder is the mock recorder for MockUserCommandPort.
-type MockUserCommandPortMockRecorder struct {
-	mock *MockUserCommandPort
+// MockUserCommandMockRecorder is the mock recorder for MockUserCommand.
+type MockUserCommandMockRecorder struct {
+	mock *MockUserCommand
 }
 
-// NewMockUserCommandPort creates a new mock instance.
-func NewMockUserCommandPort(ctrl *gomock.Controller) *MockUserCommandPort {
-	mock := &MockUserCommandPort{ctrl: ctrl}
-	mock.recorder = &MockUserCommandPortMockRecorder{mock}
+// NewMockUserCommand creates a new mock instance.
+func NewMockUserCommand(ctrl *gomock.Controller) *MockUserCommand {
+	mock := &MockUserCommand{ctrl: ctrl}
+	mock.recorder = &MockUserCommandMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockUserCommandPort) EXPECT() *MockUserCommandPortMockRecorder {
+func (m *MockUserCommand) EXPECT() *MockUserCommandMockRecorder {
 	return m.recorder
 }
 
 // Add mocks base method.
-func (m *MockUserCommandPort) Add(ctx context.Context, user *models.User) error {
+func (m *MockUserCommand) Add(ctx context.Context, user *models.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Add", ctx, user)
 	ret0, _ := ret[0].(error)
@@ -51,13 +51,13 @@ func (m *MockUserCommandPort) Add(ctx context.Context, user *models.User) error 
 }
 
 // Add indicates an expected call of Add.
-func (mr *MockUserCommandPortMockRecorder) Add(ctx, user any) *gomock.Call {
+func (mr *MockUserCommandMockRecorder) Add(ctx, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockUserCommandPort)(nil).Add), ctx, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockUserCommand)(nil).Add), ctx, user)
 }
 
 // DeleteByID mocks base method.
-func (m *MockUserCommandPort) DeleteByID(ctx context.Context, id uuid.UUID) error {
+func (m *MockUserCommand) DeleteByID(ctx context.Context, id uuid.UUID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteByID", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -65,13 +65,13 @@ func (m *MockUserCommandPort) DeleteByID(ctx context.Context, id uuid.UUID) erro
 }
 
 // DeleteByID indicates an expected call of DeleteByID.
-func (mr *MockUserCommandPortMockRecorder) DeleteByID(ctx, id any) *gomock.Call {
+func (mr *MockUserCommandMockRecorder) DeleteByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteByID", reflect.TypeOf((*MockUserCommandPort)(nil).DeleteByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteByID", reflect.TypeOf((*MockUserCommand)(nil).DeleteByID), ctx, id)
 }
 
 // DeleteByTgID mocks base method.
-func (m *MockUserCommandPort) DeleteByTgID(ctx context.Context, id int64) error {
+func (m *MockUserCommand) DeleteByTgID(ctx context.Context, id int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteByTgID", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -79,13 +79,13 @@ func (m *MockUserCommandPort) DeleteByTgID(ctx context.Context, id int64) error 
 }
 
 // DeleteByTgID indicates an expected call of DeleteByTgID.
-func (mr *MockUserCommandPortMockRecorder) DeleteByTgID(ctx, id any) *gomock.Call {
+func (mr *MockUserCommandMockRecorder) DeleteByTgID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteByTgID", reflect.TypeOf((*MockUserCommandPort)(nil).DeleteByTgID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteByTgID", reflect.TypeOf((*MockUserCommand)(nil).DeleteByTgID), ctx, id)
 }
 
 // UpdateByID mocks base method.
-func (m *MockUserCommandPort) UpdateByID(ctx context.Context, id uuid.UUID, user *models.UserUpdate) error {
+func (m *MockUserCommand) UpdateByID(ctx context.Context, id uuid.UUID, user *models.UserUpdate) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateByID", ctx, id, user)
 	ret0, _ := ret[0].(error)
@@ -93,13 +93,13 @@ func (m *MockUserCommandPort) UpdateByID(ctx context.Context, id uuid.UUID, user
 }
 
 // UpdateByID indicates an expected call of UpdateByID.
-func (mr *MockUserCommandPortMockRecorder) UpdateByID(ctx, id, user any) *gomock.Call {
+func (mr *MockUserCommandMockRecorder) UpdateByID(ctx, id, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateByID", reflect.TypeOf((*MockUserCommandPort)(nil).UpdateByID), ctx, id, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateByID", reflect.TypeOf((*MockUserCommand)(nil).UpdateByID), ctx, id, user)
 }
 
 // UpdateByTgID mocks base method.
-func (m *MockUserCommandPort) UpdateByTgID(ctx context.Context, id int64, user *models.UserUpdate) error {
+func (m *MockUserCommand) UpdateByTgID(ctx context.Context, id int64, user *models.UserUpdate) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateByTgID", ctx, id, user)
 	ret0, _ := ret[0].(error)
@@ -107,37 +107,37 @@ func (m *MockUserCommandPort) UpdateByTgID(ctx context.Context, id int64, user *
 }
 
 // UpdateByTgID indicates an expected call of UpdateByTgID.
-func (mr *MockUserCommandPortMockRecorder) UpdateByTgID(ctx, id, user any) *gomock.Call {
+func (mr *MockUserCommandMockRecorder) UpdateByTgID(ctx, id, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateByTgID", reflect.TypeOf((*MockUserCommandPort)(nil).UpdateByTgID), ctx, id, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateByTgID", reflect.TypeOf((*MockUserCommand)(nil).UpdateByTgID), ctx, id, user)
 }
 
-// MockUserQueryPort is a mock of UserQueryPort interface.
-type MockUserQueryPort struct {
+// MockUserQuery is a mock of UserQuery interface.
+type MockUserQuery struct {
 	ctrl     *gomock.Controller
-	recorder *MockUserQueryPortMockRecorder
+	recorder *MockUserQueryMockRecorder
 	isgomock struct{}
 }
 
-// MockUserQueryPortMockRecorder is the mock recorder for MockUserQueryPort.
-type MockUserQueryPortMockRecorder struct {
-	mock *MockUserQueryPort
+// MockUserQueryMockRecorder is the mock recorder for MockUserQuery.
+type MockUserQueryMockRecorder struct {
+	mock *MockUserQuery
 }
 
-// NewMockUserQueryPort creates a new mock instance.
-func NewMockUserQueryPort(ctrl *gomock.Controller) *MockUserQueryPort {
-	mock := &MockUserQueryPort{ctrl: ctrl}
-	mock.recorder = &MockUserQueryPortMockRecorder{mock}
+// NewMockUserQuery creates a new mock instance.
+func NewMockUserQuery(ctrl *gomock.Controller) *MockUserQuery {
+	mock := &MockUserQuery{ctrl: ctrl}
+	mock.recorder = &MockUserQueryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockUserQueryPort) EXPECT() *MockUserQueryPortMockRecorder {
+func (m *MockUserQuery) EXPECT() *MockUserQueryMockRecorder {
 	return m.recorder
 }
 
 // GetByID mocks base method.
-func (m *MockUserQueryPort) GetByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
+func (m *MockUserQuery) GetByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", ctx, id)
 	ret0, _ := ret[0].(*models.User)
@@ -146,13 +146,13 @@ func (m *MockUserQueryPort) GetByID(ctx context.Context, id uuid.UUID) (*models.
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockUserQueryPortMockRecorder) GetByID(ctx, id any) *gomock.Call {
+func (mr *MockUserQueryMockRecorder) GetByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUserQueryPort)(nil).GetByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUserQuery)(nil).GetByID), ctx, id)
 }
 
 // GetByTgID mocks base method.
-func (m *MockUserQueryPort) GetByTgID(ctx context.Context, id int64) (*models.User, error) {
+func (m *MockUserQuery) GetByTgID(ctx context.Context, id int64) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByTgID", ctx, id)
 	ret0, _ := ret[0].(*models.User)
@@ -161,13 +161,13 @@ func (m *MockUserQueryPort) GetByTgID(ctx context.Context, id int64) (*models.Us
 }
 
 // GetByTgID indicates an expected call of GetByTgID.
-func (mr *MockUserQueryPortMockRecorder) GetByTgID(ctx, id any) *gomock.Call {
+func (mr *MockUserQueryMockRecorder) GetByTgID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByTgID", reflect.TypeOf((*MockUserQueryPort)(nil).GetByTgID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByTgID", reflect.TypeOf((*MockUserQuery)(nil).GetByTgID), ctx, id)
 }
 
 // GetID mocks base method.
-func (m *MockUserQueryPort) GetID(ctx context.Context, id int64) (uuid.UUID, error) {
+func (m *MockUserQuery) GetID(ctx context.Context, id int64) (uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetID", ctx, id)
 	ret0, _ := ret[0].(uuid.UUID)
@@ -176,13 +176,13 @@ func (m *MockUserQueryPort) GetID(ctx context.Context, id int64) (uuid.UUID, err
 }
 
 // GetID indicates an expected call of GetID.
-func (mr *MockUserQueryPortMockRecorder) GetID(ctx, id any) *gomock.Call {
+func (mr *MockUserQueryMockRecorder) GetID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetID", reflect.TypeOf((*MockUserQueryPort)(nil).GetID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetID", reflect.TypeOf((*MockUserQuery)(nil).GetID), ctx, id)
 }
 
 // GetTgID mocks base method.
-func (m *MockUserQueryPort) GetTgID(ctx context.Context, id uuid.UUID) (int64, error) {
+func (m *MockUserQuery) GetTgID(ctx context.Context, id uuid.UUID) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTgID", ctx, id)
 	ret0, _ := ret[0].(int64)
@@ -191,9 +191,9 @@ func (m *MockUserQueryPort) GetTgID(ctx context.Context, id uuid.UUID) (int64, e
 }
 
 // GetTgID indicates an expected call of GetTgID.
-func (mr *MockUserQueryPortMockRecorder) GetTgID(ctx, id any) *gomock.Call {
+func (mr *MockUserQueryMockRecorder) GetTgID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTgID", reflect.TypeOf((*MockUserQueryPort)(nil).GetTgID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTgID", reflect.TypeOf((*MockUserQuery)(nil).GetTgID), ctx, id)
 }
 
 // MockUserRepoPort is a mock of UserRepoPort interface.
@@ -350,6 +350,166 @@ func (mr *MockUserRepoPortMockRecorder) UpdateByTgID(ctx, id, user any) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateByTgID", reflect.TypeOf((*MockUserRepoPort)(nil).UpdateByTgID), ctx, id, user)
 }
 
+// MockUserCacheInvalidator is a mock of UserCacheInvalidator interface.
+type MockUserCacheInvalidator struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserCacheInvalidatorMockRecorder
+	isgomock struct{}
+}
+
+// MockUserCacheInvalidatorMockRecorder is the mock recorder for MockUserCacheInvalidator.
+type MockUserCacheInvalidatorMockRecorder struct {
+	mock *MockUserCacheInvalidator
+}
+
+// NewMockUserCacheInvalidator creates a new mock instance.
+func NewMockUserCacheInvalidator(ctrl *gomock.Controller) *MockUserCacheInvalidator {
+	mock := &MockUserCacheInvalidator{ctrl: ctrl}
+	mock.recorder = &MockUserCacheInvalidatorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUserCacheInvalidator) EXPECT() *MockUserCacheInvalidatorMockRecorder {
+	return m.recorder
+}
+
+// InvalidateUserByID mocks base method.
+func (m *MockUserCacheInvalidator) InvalidateUserByID(ctx context.Context, id uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InvalidateUserByID", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InvalidateUserByID indicates an expected call of InvalidateUserByID.
+func (mr *MockUserCacheInvalidatorMockRecorder) InvalidateUserByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateUserByID", reflect.TypeOf((*MockUserCacheInvalidator)(nil).InvalidateUserByID), ctx, id)
+}
+
+// InvalidateUserByTgID mocks base method.
+func (m *MockUserCacheInvalidator) InvalidateUserByTgID(ctx context.Context, id int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InvalidateUserByTgID", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InvalidateUserByTgID indicates an expected call of InvalidateUserByTgID.
+func (mr *MockUserCacheInvalidatorMockRecorder) InvalidateUserByTgID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateUserByTgID", reflect.TypeOf((*MockUserCacheInvalidator)(nil).InvalidateUserByTgID), ctx, id)
+}
+
+// InvalidateUserID mocks base method.
+func (m *MockUserCacheInvalidator) InvalidateUserID(ctx context.Context, id uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InvalidateUserID", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InvalidateUserID indicates an expected call of InvalidateUserID.
+func (mr *MockUserCacheInvalidatorMockRecorder) InvalidateUserID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateUserID", reflect.TypeOf((*MockUserCacheInvalidator)(nil).InvalidateUserID), ctx, id)
+}
+
+// InvalidateUserTgID mocks base method.
+func (m *MockUserCacheInvalidator) InvalidateUserTgID(ctx context.Context, id int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InvalidateUserTgID", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InvalidateUserTgID indicates an expected call of InvalidateUserTgID.
+func (mr *MockUserCacheInvalidatorMockRecorder) InvalidateUserTgID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateUserTgID", reflect.TypeOf((*MockUserCacheInvalidator)(nil).InvalidateUserTgID), ctx, id)
+}
+
+// MockUserCacheCommand is a mock of UserCacheCommand interface.
+type MockUserCacheCommand struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserCacheCommandMockRecorder
+	isgomock struct{}
+}
+
+// MockUserCacheCommandMockRecorder is the mock recorder for MockUserCacheCommand.
+type MockUserCacheCommandMockRecorder struct {
+	mock *MockUserCacheCommand
+}
+
+// NewMockUserCacheCommand creates a new mock instance.
+func NewMockUserCacheCommand(ctrl *gomock.Controller) *MockUserCacheCommand {
+	mock := &MockUserCacheCommand{ctrl: ctrl}
+	mock.recorder = &MockUserCacheCommandMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUserCacheCommand) EXPECT() *MockUserCacheCommandMockRecorder {
+	return m.recorder
+}
+
+// AddByID mocks base method.
+func (m *MockUserCacheCommand) AddByID(ctx context.Context, user *models.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddByID", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddByID indicates an expected call of AddByID.
+func (mr *MockUserCacheCommandMockRecorder) AddByID(ctx, user any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddByID", reflect.TypeOf((*MockUserCacheCommand)(nil).AddByID), ctx, user)
+}
+
+// AddByTgID mocks base method.
+func (m *MockUserCacheCommand) AddByTgID(ctx context.Context, user *models.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddByTgID", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddByTgID indicates an expected call of AddByTgID.
+func (mr *MockUserCacheCommandMockRecorder) AddByTgID(ctx, user any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddByTgID", reflect.TypeOf((*MockUserCacheCommand)(nil).AddByTgID), ctx, user)
+}
+
+// AddID mocks base method.
+func (m *MockUserCacheCommand) AddID(ctx context.Context, key int64, val uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddID", ctx, key, val)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddID indicates an expected call of AddID.
+func (mr *MockUserCacheCommandMockRecorder) AddID(ctx, key, val any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddID", reflect.TypeOf((*MockUserCacheCommand)(nil).AddID), ctx, key, val)
+}
+
+// AddTgID mocks base method.
+func (m *MockUserCacheCommand) AddTgID(ctx context.Context, key uuid.UUID, val int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddTgID", ctx, key, val)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddTgID indicates an expected call of AddTgID.
+func (mr *MockUserCacheCommandMockRecorder) AddTgID(ctx, key, val any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTgID", reflect.TypeOf((*MockUserCacheCommand)(nil).AddTgID), ctx, key, val)
+}
+
 // MockUserCachePort is a mock of UserCachePort interface.
 type MockUserCachePort struct {
 	ctrl     *gomock.Controller
@@ -372,6 +532,62 @@ func NewMockUserCachePort(ctrl *gomock.Controller) *MockUserCachePort {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockUserCachePort) EXPECT() *MockUserCachePortMockRecorder {
 	return m.recorder
+}
+
+// AddByID mocks base method.
+func (m *MockUserCachePort) AddByID(ctx context.Context, user *models.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddByID", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddByID indicates an expected call of AddByID.
+func (mr *MockUserCachePortMockRecorder) AddByID(ctx, user any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddByID", reflect.TypeOf((*MockUserCachePort)(nil).AddByID), ctx, user)
+}
+
+// AddByTgID mocks base method.
+func (m *MockUserCachePort) AddByTgID(ctx context.Context, user *models.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddByTgID", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddByTgID indicates an expected call of AddByTgID.
+func (mr *MockUserCachePortMockRecorder) AddByTgID(ctx, user any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddByTgID", reflect.TypeOf((*MockUserCachePort)(nil).AddByTgID), ctx, user)
+}
+
+// AddID mocks base method.
+func (m *MockUserCachePort) AddID(ctx context.Context, key int64, val uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddID", ctx, key, val)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddID indicates an expected call of AddID.
+func (mr *MockUserCachePortMockRecorder) AddID(ctx, key, val any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddID", reflect.TypeOf((*MockUserCachePort)(nil).AddID), ctx, key, val)
+}
+
+// AddTgID mocks base method.
+func (m *MockUserCachePort) AddTgID(ctx context.Context, key uuid.UUID, val int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddTgID", ctx, key, val)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddTgID indicates an expected call of AddTgID.
+func (mr *MockUserCachePortMockRecorder) AddTgID(ctx, key, val any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTgID", reflect.TypeOf((*MockUserCachePort)(nil).AddTgID), ctx, key, val)
 }
 
 // GetByID mocks base method.
