@@ -132,9 +132,11 @@ services:
       kafka:
         condition: service_started
   transcriber:
-    image: transcriber:0.1.1
+    image: transcriber:0.1.1-${WHISPER_MODEL:-base}
     build:
       context: ./services/transcriber
+      args:
+        MODEL: ${WHISPER_MODEL:-base}
     environment:
       S3_ACCESS_KEY_ID: moonfire
       S3_SECRET_ACCESS_KEY: moonfire
