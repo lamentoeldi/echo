@@ -3,6 +3,7 @@ kind: Service
 
 metadata:
   name: redis
+  namespace: dev
 
 spec:
   clusterIP: None
