@@ -53,7 +53,7 @@ class TranscribeAudioUseCase(AbstractTranscribeAudioUseCase):
         msg = self._core.make_transcription_message(
             msg_id=md.content.id,
             user_id=md.content.user_id,
-            transcription=transcription,
+            transcription=transcription.transcription,
             dest=md.content.source,
         )
 

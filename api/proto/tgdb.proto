@@ -1,0 +1,93 @@
+syntax="proto3";
+package tgdb;
+
+option go_package = "./proto";
+
+service TgDB {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse);
+  rpc GetUserByTgID(GetUserByTgIDRequest) returns (GetUserByTgIDResponse);
+  rpc UpdateUserByID(UpdateUserByIDRequest) returns (UpdateUserByIDResponse);
+  rpc UpdateUserByTgID(UpdateUserByTgIDRequest) returns (UpdateUserByTgIDResponse);
+  rpc DeleteUserByID(DeleteUserByIDRequest) returns (DeleteUserByIDResponse);
+  rpc DeleteUserByTgID(DeleteUserByTgIDRequest) returns (DeleteUserByTgIDResponse);
+  rpc GetUserID(GetUserIDRequest) returns (GetUserIDResponse);
+  rpc GetUserTgID(GetUserTgIDRequest) returns (GetUserTgIDResponse);
+}
+
+message User {
+  string id = 1;  // uuid
+  int64 tg_id = 2;
+  optional string tg_username = 3;
+  string lang = 4;
+  int64 created_at = 5;  // unix nano timestamp
+}
+
+message CreateUserRequest {
+  User user = 1;
+}
+
+message CreateUserResponse{}
+
+message GetUserByIDRequest {
+  string id = 1;  // uuid
+}
+
+message GetUserByIDResponse {
+  User user = 1;
+}
+
+message GetUserByTgIDRequest {
+  int64 tg_id = 1;
+}
+
+message GetUserByTgIDResponse {
+  User user = 1;
+}
+
+message UserUpdate {
+  optional string tg_username = 1;
+  optional string lang = 2;
+}
+
+message UpdateUserByIDRequest {
+  string id = 1;  // uuid
+  UserUpdate update = 2;
+}
+
+message UpdateUserByIDResponse {}
+
+message UpdateUserByTgIDRequest {
+  int64 tg_id = 1;
+  UserUpdate update = 2;
+}
+
+message UpdateUserByTgIDResponse {}
+
+message DeleteUserByIDRequest {
+  string id = 1;
+}
+
+message DeleteUserByIDResponse {}
+
+message DeleteUserByTgIDRequest {
+  int64 tg_id = 1;
+}
+
+message DeleteUserByTgIDResponse {}
+
+message GetUserIDRequest {
+  int64 tg_id = 1;
+}
+
+message GetUserIDResponse {
+  string id = 1;
+}
+
+message GetUserTgIDRequest {
+  string id = 1;
+}
+
+message GetUserTgIDResponse {
+  int64 tg_id = 1;
+}

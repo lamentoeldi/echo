@@ -63,4 +63,4 @@ class S3StoragePort(StoragePort):
         )
 
         async with sess.client("s3", endpoint_url=self.config.s3_url) as s3:
-            await s3.delete_object(self.input_bucket, filename)
+            await s3.delete_object(Bucket=self.input_bucket, Key=filename)
