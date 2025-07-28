@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: s3-config
+
+data:
+  MINIO_ROOT_USER: "moonfire"
+  MINIO_ROOT_PASSWORD: "moonfire"

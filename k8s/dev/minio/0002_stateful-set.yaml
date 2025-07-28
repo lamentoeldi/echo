@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: s3
+  namespace: dev
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3
+  serviceName: s3
+  template:
+    metadata:
+      namespace: dev
+      labels:
+        app: s3
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio:latest
+          imagePullPolicy: Always
+          args:
+            - server
+            - /data
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: s3-data
+              mountPath: /data
+          startupProbe:
+            exec:
+              command: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            exec:
+              command: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: s3-data
+        namespace: dev
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi

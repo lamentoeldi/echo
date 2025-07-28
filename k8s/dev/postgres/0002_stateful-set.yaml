@@ -64,6 +64,7 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: pgdata
+        namespace: dev
       spec:
         accessModes:
           - ReadWriteOnce
