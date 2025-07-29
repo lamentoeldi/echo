@@ -10,6 +10,7 @@ import (
 	"github.com/echo/tgdb/internal/adapters/usecases"
 	"github.com/echo/tgdb/internal/ports"
 	"github.com/echo/tgdb/pkg/interceptors"
+	m "github.com/echo/tgdb/pkg/metrics"
 	"github.com/echo/tgdb/pkg/postgres/pool"
 	rdClient "github.com/echo/tgdb/pkg/redis"
 	"go.uber.org/zap"
@@ -67,6 +68,12 @@ func main() {
 		),
 	)
 
+	metricsCfg, err := m.NewConfig()
+	if err != nil {
+		log.Fatal("metrics config init failed", zap.Error(err))
+	}
+	metrics := m.NewMetrics(metricsCfg, log)
+
 	controllerCfg, err := transport.NewConfig()
 	if err != nil {
 		log.Fatal("transport init failed", zap.Error(err))
@@ -77,6 +84,8 @@ func main() {
 	}
 
 	controller.Run()
+	metrics.Run()
 	<-ctx.Done()
 	controller.Shutdown()
+	metrics.Shutdown()
 }
