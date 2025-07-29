@@ -144,9 +144,13 @@ func (p *PgUserRepo) UpdateByID(ctx context.Context, id uuid.UUID, user *models.
 		return fmt.Errorf(errPatternUpdateUser, resolveErr(err))
 	}
 
-	_, err = p.pool.Exec(ctx, query, args...)
+	cmd, err := p.pool.Exec(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf(errPatternUpdateUser, resolveErr(err))
+	}
+
+	if cmd.RowsAffected() != 1 {
+		return fmt.Errorf(errPatternUpdateUser, e.ErrNotFound)
 	}
 
 	return nil
@@ -171,9 +175,13 @@ func (p *PgUserRepo) UpdateByTgID(ctx context.Context, id int64, user *models.Us
 		return fmt.Errorf(errPatternUpdateUser, resolveErr(err))
 	}
 
-	_, err = p.pool.Exec(ctx, query, args...)
+	cmd, err := p.pool.Exec(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf(errPatternUpdateUser, resolveErr(err))
+	}
+
+	if cmd.RowsAffected() != 1 {
+		return fmt.Errorf(errPatternUpdateUser, e.ErrNotFound)
 	}
 
 	return nil
@@ -189,9 +197,13 @@ func (p *PgUserRepo) DeleteByID(ctx context.Context, id uuid.UUID) error {
 		return fmt.Errorf(errPatternDeleteUser, resolveErr(err))
 	}
 
-	_, err = p.pool.Exec(ctx, query, args...)
+	cmd, err := p.pool.Exec(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf(errPatternDeleteUser, resolveErr(err))
+	}
+
+	if cmd.RowsAffected() != 1 {
+		return fmt.Errorf(errPatternUpdateUser, e.ErrNotFound)
 	}
 
 	return nil
@@ -207,9 +219,13 @@ func (p *PgUserRepo) DeleteByTgID(ctx context.Context, id int64) error {
 		return fmt.Errorf(errPatternDeleteUser, resolveErr(err))
 	}
 
-	_, err = p.pool.Exec(ctx, query, args...)
+	cmd, err := p.pool.Exec(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf(errPatternDeleteUser, resolveErr(err))
+	}
+
+	if cmd.RowsAffected() != 1 {
+		return fmt.Errorf(errPatternUpdateUser, e.ErrNotFound)
 	}
 
 	return nil
