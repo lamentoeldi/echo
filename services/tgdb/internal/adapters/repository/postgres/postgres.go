@@ -42,8 +42,8 @@ type PgUserRepo struct {
 	pool *pgxpool.Pool
 }
 
-func NewUserRepo(pool *pgxpool.Pool) (*PgUserRepo, error) {
-	return &PgUserRepo{pool: pool}, nil
+func NewUserRepo(pool *pgxpool.Pool) *PgUserRepo {
+	return &PgUserRepo{pool: pool}
 }
 
 func (p *PgUserRepo) Add(ctx context.Context, user *models.User) error {

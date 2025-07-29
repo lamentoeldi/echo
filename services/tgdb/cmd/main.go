@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
-	"github.com/echo/tgdb/internal/adapters/cache/metrics"
+	cm "github.com/echo/tgdb/internal/adapters/cache/metrics"
 	"github.com/echo/tgdb/internal/adapters/cache/redis"
 	transport "github.com/echo/tgdb/internal/adapters/controllers/grpc"
+	rm "github.com/echo/tgdb/internal/adapters/repository/metrics"
 	"github.com/echo/tgdb/internal/adapters/repository/postgres"
 	"github.com/echo/tgdb/internal/adapters/usecases"
 	"github.com/echo/tgdb/internal/ports"
@@ -38,13 +39,11 @@ func main() {
 
 	var cache ports.UserCachePort
 	cache = redis.NewUserCache(cacheCfg, rd)
-	cache = metrics.NewUserCacheWithMetrics(cache)
+	cache = cm.NewUserCacheWithMetrics(cache)
 
 	var repo ports.UserRepoPort
-	repo, err = postgres.NewUserRepo(pg)
-	if err != nil {
-		log.Fatal("repo init failed", zap.Error(err))
-	}
+	repo = postgres.NewUserRepo(pg)
+	repo = rm.NewUserRepoWithMetrics(repo)
 
 	app, err := usecases.New(repo, cache)
 	if err != nil {
