@@ -7,6 +7,7 @@ Description: Echo is a voice transcription platform
 - [Requirements](#requirements)
 - [General Architecture](#general-architecture)
   - [Telegram Bot Frontend](#telegram-bot-frontend)
+  - [tgdb](#tgdb)
   - [Audio Preprocessor](#audio-preprocessor)
   - [Audio Transcriber](#audio-transcriber)
 - [Scripts](#scripts)
@@ -71,7 +72,7 @@ Version: `0.1.2`
 
 ## tgdb
 Status: `implemented`<br/>
-Version: `0.1.0`
+Version: `0.1.1`
 
 This service:
 - Manages tg bot db and cache
@@ -105,6 +106,10 @@ This service:
 `REDIS_PASSWORD`: Redis password
 
 `REDIS_DB`: Redis db (default: `0`)
+
+`METRICS_HOST`: Prometheus metrics host (default: `host`)
+
+`METRICS_PORT`: Prometheus metrics port (default: `9090`)
 
 ## Audio Preprocessor
 Status: `implemented`<br/>

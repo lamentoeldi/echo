@@ -67,7 +67,7 @@ services:
 
   # actual services
   tgdb:
-    image: tgdb:0.1.0
+    image: tgdb:0.1.1
     build:
       context: ./services/tgdb
     environment:
