@@ -6,6 +6,7 @@ import (
 	transport "github.com/echo/tgdb/internal/adapters/controllers/grpc"
 	"github.com/echo/tgdb/internal/adapters/repository/postgres"
 	"github.com/echo/tgdb/internal/adapters/usecases"
+	"github.com/echo/tgdb/pkg/interceptors"
 	"github.com/echo/tgdb/pkg/postgres/pool"
 	rdClient "github.com/echo/tgdb/pkg/redis"
 	"go.uber.org/zap"
@@ -44,7 +45,20 @@ func main() {
 		log.Fatal("usecases init failed", zap.Error(err))
 	}
 
-	s := grpc.NewServer()
+	done := make(chan struct{})
+	go func() {
+		<-done
+		cancel()
+	}()
+
+	s := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			interceptors.UnaryRequestIDInjector(),
+			interceptors.UnaryLoggerInjector(log),
+			interceptors.UnaryPanicHandler(done),
+			interceptors.UnaryErrorHandler(),
+		),
+	)
 
 	controllerCfg, err := transport.NewConfig()
 	if err != nil {
