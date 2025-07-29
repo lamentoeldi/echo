@@ -138,6 +138,8 @@ services:
       args:
         MODEL: ${WHISPER_MODEL:-base}
     environment:
+      WHISPER_MODEL: ${WHISPER_MODEL:-base}
+
       S3_ACCESS_KEY_ID: moonfire
       S3_SECRET_ACCESS_KEY: moonfire
       S3_URL: http://s3:9000

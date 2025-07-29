@@ -10,10 +10,10 @@ WORKDIR /app
 ARG MODEL=base
 
 COPY ./build.py .
-RUN pip install openai-whisper && python build.py
+RUN pip install --no-cache-dir openai-whisper && python build.py
 
 COPY requirements.txt .
-RUN pip install -r ./requirements.txt
+RUN pip install --no-cache-dir -r ./requirements.txt
 
 COPY . .
 
