@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"strconv"
 	"strings"
@@ -77,10 +78,13 @@ type UserCache struct {
 	cfg    *Config
 }
 
-func NewUserCache(cfg *Config, client redis.UniversalClient) *UserCache {
+func NewUserCache(ctx context.Context, cfg *Config, client redis.UniversalClient, log *zap.Logger) *UserCache {
+	bulk := newBulkDel(cfg, log, client)
+	bulk.startCron(ctx)
+
 	return &UserCache{
 		client: client,
-		bulk:   newBulkDel(cfg, client),
+		bulk:   bulk,
 		ttl:    cfg.TTL,
 		cfg:    cfg,
 	}

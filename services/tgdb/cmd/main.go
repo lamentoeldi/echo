@@ -24,6 +24,7 @@ func main() {
 	defer cancel()
 
 	log, _ := zap.NewProduction()
+	log = log.Named("main")
 	defer log.Sync()
 
 	rd, err := rdClient.NewRedis(nil)
@@ -39,7 +40,7 @@ func main() {
 	cacheCfg, err := redis.NewConfig()
 
 	var cache ports.UserCachePort
-	cache = redis.NewUserCache(cacheCfg, rd)
+	cache = redis.NewUserCache(ctx, cacheCfg, rd, log.Named("cache-cron"))
 	cache = cm.NewUserCacheWithMetrics(cache)
 
 	var repo ports.UserRepoPort
@@ -72,13 +73,13 @@ func main() {
 	if err != nil {
 		log.Fatal("metrics config init failed", zap.Error(err))
 	}
-	metrics := m.NewMetrics(metricsCfg, log)
+	metrics := m.NewMetrics(metricsCfg, log.Named("metrics"))
 
 	controllerCfg, err := transport.NewConfig()
 	if err != nil {
 		log.Fatal("transport init failed", zap.Error(err))
 	}
-	controller, err := transport.New(controllerCfg, s, log, app)
+	controller, err := transport.New(controllerCfg, s, log.Named("grpc"), app)
 	if err != nil {
 		log.Fatal("transport init failed", zap.Error(err))
 	}

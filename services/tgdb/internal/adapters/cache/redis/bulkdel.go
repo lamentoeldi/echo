@@ -3,21 +3,24 @@ package redis
 import (
 	"context"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 	"sync"
 	"time"
 )
 
 type bulkDel struct {
 	cfg   *Config
+	log   *zap.Logger
 	redis redis.UniversalClient
 
 	queue []string
 	mu    sync.Mutex
 }
 
-func newBulkDel(cfg *Config, redis redis.UniversalClient) *bulkDel {
+func newBulkDel(cfg *Config, log *zap.Logger, redis redis.UniversalClient) *bulkDel {
 	bulk := &bulkDel{
 		cfg:   cfg,
+		log:   log,
 		redis: redis,
 		queue: make([]string, 0, cfg.BulkMaxSize),
 	}
@@ -26,17 +29,22 @@ func newBulkDel(cfg *Config, redis redis.UniversalClient) *bulkDel {
 }
 
 func (bd *bulkDel) startCron(ctx context.Context) {
-	ticker := time.NewTicker(bd.cfg.BulkBackoff)
-	defer ticker.Stop()
+	go func() {
+		ticker := time.NewTicker(bd.cfg.BulkBackoff)
+		defer ticker.Stop()
 
-	for {
-		select {
-		case <-ticker.C:
-			_ = bd.Flush(ctx) // todo: some way to handle this error
-		case <-ctx.Done():
-			return
+		for {
+			select {
+			case <-ticker.C:
+				err := bd.Flush(ctx)
+				if err != nil {
+					bd.log.Error("failed to flush cache", zap.Error(err))
+				}
+			case <-ctx.Done():
+				return
+			}
 		}
-	}
+	}()
 }
 
 func (bd *bulkDel) Flush(ctx context.Context) error {
