@@ -71,4 +71,5 @@ func main() {
 
 	controller.Run()
 	<-ctx.Done()
+	controller.Shutdown()
 }
