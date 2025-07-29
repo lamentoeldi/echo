@@ -107,6 +107,12 @@ This service:
 
 `REDIS_DB`: Redis db (default: `0`)
 
+`REDIST_TTL`: Redis entry time-to-live (default: `900s`)
+
+`REDIS_BULK_BACKOFF`: Redis del bulk flush backoff (default: `5`)
+
+`REDIS_BULK_MAX_SIZE`: Redis del bulk max size (default: `100`)
+
 `METRICS_HOST`: Prometheus metrics host (default: `host`)
 
 `METRICS_PORT`: Prometheus metrics port (default: `9090`)
