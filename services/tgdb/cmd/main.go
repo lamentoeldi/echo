@@ -55,8 +55,10 @@ func main() {
 		grpc.ChainUnaryInterceptor(
 			interceptors.UnaryRequestIDInjector(),
 			interceptors.UnaryLoggerInjector(log),
+			interceptors.UnaryRequestsCounter(),
 			interceptors.UnaryPanicHandler(done),
 			interceptors.UnaryErrorHandler(),
+			interceptors.UnaryLatencyCounter(),
 		),
 	)
 

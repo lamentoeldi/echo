@@ -5,11 +5,23 @@ import (
 	"errors"
 	e "github.com/echo/tgdb/pkg/errors"
 	"github.com/echo/tgdb/pkg/log"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var (
+	errorsCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "tgdb_total_errors",
+		Help: "TGDB total errors",
+	})
+)
+
+func init() {
+	prometheus.MustRegister(errorsCounter)
+}
 
 func UnaryErrorHandler() grpc.UnaryServerInterceptor {
 	return func(
@@ -22,7 +34,7 @@ func UnaryErrorHandler() grpc.UnaryServerInterceptor {
 		if err == nil {
 			return res, nil
 		}
-
+		errorsCounter.Inc()
 		log.
 			FromContext(ctx).
 			Error("error handling request",
