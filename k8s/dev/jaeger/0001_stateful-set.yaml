@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: jaeger
+  namespace: dev
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaeger
+  serviceName: jaeger
+  template:
+    metadata:
+      namespace: dev
+      labels:
+        app: jaeger
+    spec:
+      containers:
+        - name: jaeger
+          image: jaegertracing/all-in-one
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 16686
+              protocol: TCP
+            - containerPort: 4318
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
+          startupProbe:
+            exec:
+              command: ["curl", "localhost:16687"]
+            initialDelaySeconds: 15
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["curl", "localhost:16687"]
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command: ["curl", "localhost:16687"]
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 3
