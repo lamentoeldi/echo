@@ -13,8 +13,8 @@ import (
 )
 
 type Config struct {
-	Endpoint    string `env:"JAEGER_ENDPOINT"`
-	ServiceName string `env:"JAEGER_SERVICE_NAME" env-default:"tgdb"`
+	Endpoint    string `env:"TRACER_ENDPOINT"`
+	ServiceName string `env:"TRACER_APP_NAME" env-default:"tgdb"`
 }
 
 func NewConfig() (*Config, error) {
