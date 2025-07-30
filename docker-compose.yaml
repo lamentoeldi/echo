@@ -65,9 +65,20 @@ services:
     depends_on:
       - tg-bot
 
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - "16686:16686"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:16686" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   # actual services
   tgdb:
-    image: registry.gitlab.com/echo-public/echo/tgdb:0.1.0
+    image: registry.gitlab.com/echo-public/echo/tgdb:0.1.2
     build:
       context: ./services/tgdb
     environment:
@@ -79,10 +90,14 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_USER: default
+
+      JAEGER_ENDPOINT: jaeger:4318
     depends_on:
       redis:
         condition: service_healthy
       postgres:
+        condition: service_healthy
+      jaeger:
         condition: service_healthy
     ports:
       - '50051:50051'

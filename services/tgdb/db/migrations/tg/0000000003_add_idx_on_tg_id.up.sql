@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_users_tg_id ON users USING btree (tg_id) INCLUDE (id);

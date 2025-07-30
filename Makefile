@@ -14,3 +14,30 @@ set-webhook:
 delete-webhook:
 	@echo "❌ Deleting webhook..."
 	@$(SCRIPTS_DIR)/delete_webhook.sh
+
+# Build go proto pb
+proto-go:
+	protoc --go_out=./services/tgdb/pkg \
+				--go-grpc_out=./services/tgdb/pkg \
+				--grpc-gateway_out=./services/tgdb/pkg \
+				./api/proto/*.proto -I=./api/proto
+
+# Build python proto pb
+proto-python:
+	python \
+		-m grpc_tools.protoc \
+  		-I./api/proto \
+  		--python_out=./services/bot/src/adapters/repository/grpc \
+  		--grpc_python_out=./services/bot/src/adapters/repository/grpc \
+  		./api/proto/tgdb.proto
+
+# Build go mocks
+mock-go:
+	mockgen \
+		-source=./services/tgdb/internal/ports/input.go \
+		-destination=./services/tgdb/pkg/mock/mock_input.go \
+		-package=mock
+	mockgen \
+    		-source=./services/tgdb/internal/ports/output.go \
+    		-destination=./services/tgdb/pkg/mock/mock_output.go \
+    		-package=mock

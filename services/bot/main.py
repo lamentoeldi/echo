@@ -6,14 +6,14 @@ from src.adapters.controllers import (
     AiogramConfig, AiogramController,
     KafkaConsumerConfig, KafkaController
 )
-from src.adapters.botapi import (
+from src.adapters.botapi.aiogram import (
     AiogramBotAPIConfig, AiogramBotAPI
 )
-from src.adapters.bus import (
+from src.adapters.bus.kafka import (
     KafkaConfig, KafkaMessageBus
 )
-from src.adapters.repository import (
-    PostgresConfig, PostgresORMRepository
+from src.adapters.repository.grpc import (
+    TgDBRepoConfig, TgDBRepo
 )
 from src.adapters.keyboards import KeyboardProvider
 from src.adapters.locale import JSONLocaleProvider
@@ -36,6 +36,7 @@ from src.infrastructure.graceful_stop import GracefulStopper
 from src.infrastructure.log import setup_logger
 
 from aiogram.fsm.storage.memory import MemoryStorage
+from grpc.aio import insecure_channel
 
 
 async def main():
@@ -46,8 +47,9 @@ async def main():
     locale = JSONLocaleProvider("src/locales")
     keyboards = KeyboardProvider("src/keyboards/keyboards.json")
 
-    pg_cfg = PostgresConfig()
-    pg_repo = PostgresORMRepository(pg_cfg)
+    tgdb_cfg = TgDBRepoConfig()
+    ch = insecure_channel(f"{tgdb_cfg.tgdb_host}:{tgdb_cfg.tgdb_port}")
+    tgdb_repo = TgDBRepo(ch)
 
     aiogram_bot_api_cfg = AiogramBotAPIConfig()
     bot = AiogramBotAPI(aiogram_bot_api_cfg)
@@ -62,19 +64,19 @@ async def main():
         config=bot_cfg,
         core=core,
         locale=locale,
-        repo=pg_repo,
+        repo=tgdb_repo,
         bot=bot,
     )
 
     uc_help = HelpUseCase(
-        repo=pg_repo,
+        repo=tgdb_repo,
         locale=locale,
         bot=bot,
     )
 
     uc_settings = SettingsUseCase(
         core=core,
-        repo=pg_repo,
+        repo=tgdb_repo,
         bot=bot,
         locale=locale,
         kb=keyboards,
@@ -82,13 +84,13 @@ async def main():
 
     uc_fallback = InvalidInputUseCase(
         locale=locale,
-        repo=pg_repo,
+        repo=tgdb_repo,
         bot=bot,
     )
 
     uc_vm = VoiceMessageUseCase(
         core=core,
-        repo=pg_repo,
+        repo=tgdb_repo,
         bot=bot,
         locale=locale,
         storage=s3,
@@ -96,13 +98,13 @@ async def main():
     )
 
     uc_error = ErrorResponseUseCase(
-        repo=pg_repo,
+        repo=tgdb_repo,
         locale=locale,
         bot=bot,
     )
 
     uc_block = UserBlockedBotUseCase(
-        repo=pg_repo,
+        repo=tgdb_repo,
     )
 
     fsm_storage = MemoryStorage()
