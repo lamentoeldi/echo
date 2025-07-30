@@ -8,11 +8,14 @@ import (
 	rm "github.com/echo/tgdb/internal/adapters/repository/metrics"
 	"github.com/echo/tgdb/internal/adapters/repository/postgres"
 	"github.com/echo/tgdb/internal/adapters/usecases"
+	"github.com/echo/tgdb/internal/config"
 	"github.com/echo/tgdb/internal/ports"
 	"github.com/echo/tgdb/pkg/interceptors"
 	m "github.com/echo/tgdb/pkg/metrics"
+	"github.com/echo/tgdb/pkg/otlp"
 	"github.com/echo/tgdb/pkg/postgres/pool"
 	rdClient "github.com/echo/tgdb/pkg/redis"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"os/signal"
@@ -58,13 +61,25 @@ func main() {
 		cancel()
 	}()
 
+	cfg, err := config.New()
+	if err != nil {
+		log.Fatal("config init failed", zap.Error(err))
+	}
+
+	tracerStop, err := otlp.InitHttp(ctx, nil)
+	if err != nil {
+		log.Fatal("otlp init failed", zap.Error(err))
+	}
+
 	s := grpc.NewServer(
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
 			interceptors.UnaryRequestIDInjector(),
 			interceptors.UnaryLoggerInjector(log),
 			interceptors.UnaryRequestsCounter(),
 			interceptors.UnaryPanicHandler(done),
 			interceptors.UnaryErrorHandler(),
+			interceptors.UnaryTracer(cfg.AppName, cfg.AppID, log),
 			interceptors.UnaryLatencyCounter(),
 		),
 	)
@@ -86,7 +101,13 @@ func main() {
 
 	controller.Run()
 	metrics.Run()
+
 	<-ctx.Done()
+
+	stopCtx, cancel := context.WithTimeout(context.Background(), cfg.StopTimeout)
+	defer cancel()
+
 	controller.Shutdown()
 	metrics.Shutdown()
+	_ = tracerStop(stopCtx)
 }
