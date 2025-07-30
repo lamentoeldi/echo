@@ -72,17 +72,25 @@ Version: `0.1.2`
 
 ## tgdb
 Status: `implemented`<br/>
-Version: `0.1.1`
+Version: `0.1.2`
 
 This service:
 - Manages tg bot db and cache
-- Provides reliable and performant data accsess API
+- Provides reliable and performant data access API
 
 ### Dependencies
 - Postgres
 - Redis
 
 ### Configuration
+`APP_NAME`: Application name (default: `tgdb`)
+
+`APP_ID`: Application ID (default: `tgdb`)
+
+`LOG_LEVEL`: Log level (default: `info`) (values: `debug`, `info`, `warn`, `error`, `fatal`)
+
+`LOG_FORMAT`: Log format (default: `json`) (values: `text`, `json`)
+
 `GRPC_HOST`: gRPC host (default: `0.0.0.0`)
 
 `GRPC_PORT`: gRPC port (default: `50051`)
@@ -116,6 +124,10 @@ This service:
 `METRICS_HOST`: Prometheus metrics host (default: `host`)
 
 `METRICS_PORT`: Prometheus metrics port (default: `9090`)
+
+`TRACER_ENDPOINT`: Tracing collector backend endpoint (example: `jaeger:4318`)
+
+`TRACER_APP_NAME`: Tracer app name (default: `tgdb`)
 
 ## Audio Preprocessor
 Status: `implemented`<br/>
