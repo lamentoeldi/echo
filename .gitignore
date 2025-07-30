@@ -2,3 +2,4 @@
 .venv
 **/*.env
 *.env
+k8s/dev/secret.yaml

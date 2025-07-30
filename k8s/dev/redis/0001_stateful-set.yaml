@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       app: redis
-  serviceName: postgres
+  serviceName: redis
   template:
     metadata:
       namespace: dev
@@ -35,21 +35,21 @@ spec:
               mountPath: /data/redis
           startupProbe:
             exec:
-              command: [ "CMD", "redis-cli", "ping" ]
+              command: [ "redis-cli", "ping" ]
             initialDelaySeconds: 15
             failureThreshold: 5
             periodSeconds: 10
             timeoutSeconds: 5
           livenessProbe:
             exec:
-              command: [ "CMD", "redis-cli", "ping" ]
+              command: [ "redis-cli", "ping" ]
             initialDelaySeconds: 15
             periodSeconds: 5
             failureThreshold: 3
             timeoutSeconds: 3
           readinessProbe:
             exec:
-              command: [ "CMD", "redis-cli", "ping" ]
+              command: [ "redis-cli", "ping" ]
             initialDelaySeconds: 15
             periodSeconds: 5
             failureThreshold: 3

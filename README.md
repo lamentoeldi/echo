@@ -121,7 +121,7 @@ This service:
 
 `REDIS_BULK_MAX_SIZE`: Redis del bulk max size (default: `100`)
 
-`METRICS_HOST`: Prometheus metrics host (default: `host`)
+`METRICS_HOST`: Prometheus metrics host (default: `0.0.0.0`)
 
 `METRICS_PORT`: Prometheus metrics port (default: `9090`)
 

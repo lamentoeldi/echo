@@ -35,21 +35,21 @@ spec:
               memory: 512Mi
           startupProbe:
             exec:
-              command: ["curl", "localhost:16687"]
+              command: ["wget", "--spider", "-q", "http://0.0.0.0:16686"]
             initialDelaySeconds: 15
             failureThreshold: 5
             periodSeconds: 10
             timeoutSeconds: 5
           livenessProbe:
             exec:
-              command: ["curl", "localhost:16687"]
+              command: ["wget", "--spider", "-q", "http://0.0.0.0:16686"]
             initialDelaySeconds: 15
             periodSeconds: 5
             failureThreshold: 3
             timeoutSeconds: 3
           readinessProbe:
             exec:
-              command: ["curl", "localhost:16687"]
+              command: ["wget", "--spider", "-q", "http://0.0.0.0:16686"]
             initialDelaySeconds: 15
             periodSeconds: 5
             failureThreshold: 3

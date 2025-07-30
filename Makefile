@@ -41,3 +41,12 @@ mock-go:
     		-source=./services/tgdb/internal/ports/output.go \
     		-destination=./services/tgdb/pkg/mock/mock_output.go \
     		-package=mock
+
+# Create dev container registry secret
+registry-secret-dev:
+	kubectl create secret docker-registry $(REGISTRY_SECRET_NAME) \
+      --docker-server=$(REGISTRY_ADDRESS) \
+      --docker-username=$(REGISTRY_USERNAME) \
+      --docker-password=$(REGISTRY_PASSWORD) \
+      --docker-email=$(REGISTRY_EMAIL) \
+      --dry-run=client -o yaml > k8s/dev/secret.yaml
