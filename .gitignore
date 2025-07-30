@@ -3,3 +3,4 @@
 **/*.env
 *.env
 k8s/dev/secret.yaml
+k8s/dev/tgbot/0002_secret.yaml

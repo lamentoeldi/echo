@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tgbot
+  namespace: dev
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tgbot
+  template:
+    metadata:
+      namespace: dev
+      labels:
+        app: tgbot
+    spec:
+      containers:
+        - name: tgbot
+          image: registry.gitlab.com/echo-public/echo/bot:0.1.2
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: tgbot-config
+            - secretRef:
+                name: tgbot-secret
+      imagePullSecrets:
+        - name: gitlab-registry
