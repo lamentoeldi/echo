@@ -3,10 +3,13 @@ from uuid import UUID
 
 from domain.models import UserUpdate, User
 from domain.ports.output import RepositoryPort
+from domain.expections import AlreadyExists, NotFound, InvalidArgument
 from . import tgdb_pb2 as pb
 from . import tgdb_pb2_grpc as pb2
 
 import grpc
+from grpc import StatusCode
+from grpc.aio import AioRpcError
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -30,7 +33,13 @@ class TgDBRepo(RepositoryPort):
                 lang=user.language
             )
         )
-        await self._stub.CreateUser(req)
+
+        try:
+            await self._stub.CreateUser(req)
+        except AioRpcError as err:
+            if err.code() == StatusCode.ALREADY_EXISTS:
+                raise AlreadyExists(str(err))
+            raise
 
     @overload
     async def get_user(self, tg_id: int) -> User:
@@ -75,12 +84,19 @@ class TgDBRepo(RepositoryPort):
         )
 
     async def get_user(self, key: Union[int, UUID]) -> User:
-        if isinstance(key, int):
-            return await self._get_user_by_tg_id(key)
-        elif isinstance(key, UUID):
-            return await self._get_user_by_id(key)
-        else:
-            raise TypeError(f"Unsupported key type: {type(key)}")
+        try:
+            if isinstance(key, int):
+                return await self._get_user_by_tg_id(key)
+            elif isinstance(key, UUID):
+                return await self._get_user_by_id(key)
+            else:
+                raise TypeError(f"Unsupported key type: {type(key)}")
+        except AioRpcError as err:
+            if err.code() == StatusCode.NOT_FOUND:
+                raise NotFound(str(err))
+            elif err.code() == StatusCode.INVALID_ARGUMENT:
+                raise InvalidArgument(str(err))
+            raise
 
     @overload
     async def update_user(self, tg_id: int, update: UserUpdate):
@@ -123,16 +139,27 @@ class TgDBRepo(RepositoryPort):
         await self._stub.UpdateUserByID(req)
 
     async def update_user(self, key: Union[int, UUID], update: UserUpdate):
-        if isinstance(key, int):
-            return await self._update_user_by_tg_id(key, update)
-        elif isinstance(key, UUID):
-            return await self._update_user_by_id(key, update)
-        else:
-            raise TypeError(f"Unsupported key type: {type(key)}")
+        try:
+            if isinstance(key, int):
+                return await self._update_user_by_tg_id(key, update)
+            elif isinstance(key, UUID):
+                return await self._update_user_by_id(key, update)
+            else:
+                raise TypeError(f"Unsupported key type: {type(key)}")
+        except AioRpcError as err:
+            if err.code() == StatusCode.NOT_FOUND:
+                raise NotFound(str(err))
+            raise
 
     async def delete_user(self, tg_id: int):
         req = pb.DeleteUserByTgIDRequest(tg_id=tg_id)
-        await self._stub.DeleteUserByTgID(req)
+
+        try:
+            await self._stub.DeleteUserByTgID(req)
+        except AioRpcError as err:
+            if err.code() == StatusCode.NOT_FOUND:
+                raise NotFound(str(err))
+            raise
 
     @overload
     async def get_user_id(self, tg_id: int) -> UUID:
@@ -163,9 +190,16 @@ class TgDBRepo(RepositoryPort):
         return res.tg_id
 
     async def get_user_id(self, key: Union[int, UUID]) -> Union[UUID, int]:
-        if isinstance(key, int):
-            return await self._get_user_id_by_tg_id(key)
-        elif isinstance(key, UUID):
-            return await self._get_tg_id_by_id(key)
-        else:
-            raise TypeError(f"Unsupported key type: {type(key)}")
+        try:
+            if isinstance(key, int):
+                return await self._get_user_id_by_tg_id(key)
+            elif isinstance(key, UUID):
+                return await self._get_tg_id_by_id(key)
+            else:
+                raise TypeError(f"Unsupported key type: {type(key)}")
+        except AioRpcError as err:
+            if err.code() == StatusCode.NOT_FOUND:
+                raise NotFound(str(err))
+            elif err.code() == StatusCode.INVALID_ARGUMENT:
+                raise InvalidArgument(str(err))
+            raise

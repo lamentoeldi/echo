@@ -26,6 +26,7 @@ from domain.models import (
     AudioRawMessage,
     RemoveReplyKeyboard
 )
+from domain.exceptions import AlreadyExists
 from config import BotConfig
 
 from structlog.stdlib import BoundLogger
@@ -115,11 +116,14 @@ class StartUseCase(AbstractStartUseCase):
             (tg_id, tg_username, default_lang)
         )
 
-        await (
-            self
-            .repo
-            .add_user(user)
-        )
+        try:
+            await (
+                self
+                .repo
+                .add_user(user)
+            )
+        except AlreadyExists:
+            pass
 
 
 class HelpUseCase(AbstractHelpUseCase):

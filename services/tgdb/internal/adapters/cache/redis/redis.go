@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"strconv"
 	"strings"
@@ -56,7 +57,9 @@ func wrapErr(err error) (error, bool) {
 }
 
 type Config struct {
-	TTL time.Duration `env:"REDIS_TTL" env-default:"900s"`
+	TTL         time.Duration `env:"REDIS_TTL" env-default:"900s"`
+	BulkBackoff time.Duration `env:"REDIS_BULK_BACKOFF" env-default:"5s"`
+	BulkMaxSize int           `env:"REDIS_BULK_MAX_SIZE" env-default:"100"`
 }
 
 func NewConfig() (*Config, error) {
@@ -70,13 +73,18 @@ func NewConfig() (*Config, error) {
 
 type UserCache struct {
 	client redis.UniversalClient
+	bulk   *bulkDel
 	ttl    time.Duration
 	cfg    *Config
 }
 
-func NewUserCache(cfg *Config, client redis.UniversalClient) *UserCache {
+func NewUserCache(ctx context.Context, cfg *Config, client redis.UniversalClient, log *zap.Logger) *UserCache {
+	bulk := newBulkDel(cfg, log, client)
+	bulk.startCron(ctx)
+
 	return &UserCache{
 		client: client,
+		bulk:   bulk,
 		ttl:    cfg.TTL,
 		cfg:    cfg,
 	}
@@ -204,20 +212,20 @@ func (c *UserCache) GetTgID(ctx context.Context, id uuid.UUID) (int64, error) {
 
 func (c *UserCache) InvalidateUserID(ctx context.Context, id uuid.UUID) error {
 	key := getKeyID(id)
-	return c.client.Del(ctx, key).Err()
+	return c.bulk.Del(ctx, key)
 }
 
 func (c *UserCache) InvalidateUserByID(ctx context.Context, id uuid.UUID) error {
 	key := getUserKeyID(id)
-	return c.client.Del(ctx, key).Err()
+	return c.bulk.Del(ctx, key)
 }
 
 func (c *UserCache) InvalidateUserTgID(ctx context.Context, id int64) error {
 	key := getKeyTgID(id)
-	return c.client.Del(ctx, key).Err()
+	return c.bulk.Del(ctx, key)
 }
 
 func (c *UserCache) InvalidateUserByTgID(ctx context.Context, id int64) error {
 	key := getUserKeyTgID(id)
-	return c.client.Del(ctx, key).Err()
+	return c.bulk.Del(ctx, key)
 }

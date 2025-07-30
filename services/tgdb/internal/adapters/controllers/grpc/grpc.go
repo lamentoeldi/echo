@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/echo/tgdb/internal/domain/models"
 	"github.com/echo/tgdb/internal/ports"
+	e "github.com/echo/tgdb/pkg/errors"
 	pb "github.com/echo/tgdb/pkg/proto"
 	"github.com/echo/tgdb/pkg/protoutils"
 	"github.com/google/uuid"
@@ -14,6 +15,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"net"
+)
+
+const (
+	msgInvalidUUID = "invalid user id"
 )
 
 type Config struct {
@@ -52,25 +57,25 @@ func New(cfg *Config, server *grpc.Server, log *zap.Logger, app ports.UseCasePor
 	return c, nil
 }
 
-func (s *Controller) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+func (c *Controller) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	user := protoutils.ToDTO(req.User)
-	err := s.app.CreateUser(ctx, user)
+	err := c.app.CreateUser(ctx, user)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, e.New(err)
 	}
 
 	return &pb.CreateUserResponse{}, nil
 }
 
-func (s *Controller) GetUserByID(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.GetUserByIDResponse, error) {
+func (c *Controller) GetUserByID(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.GetUserByIDResponse, error) {
 	uid, err := uuid.Parse(req.GetId())
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, msgInvalidUUID)
 	}
 
-	user, err := s.app.GetUserByID(ctx, uid)
+	user, err := c.app.GetUserByID(ctx, uid)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, e.New(err)
 	}
 
 	res := &pb.GetUserByIDResponse{
@@ -80,10 +85,10 @@ func (s *Controller) GetUserByID(ctx context.Context, req *pb.GetUserByIDRequest
 	return res, nil
 }
 
-func (s *Controller) GetUserByTgID(ctx context.Context, req *pb.GetUserByTgIDRequest) (*pb.GetUserByTgIDResponse, error) {
-	user, err := s.app.GetUserByTgID(ctx, req.GetTgId())
+func (c *Controller) GetUserByTgID(ctx context.Context, req *pb.GetUserByTgIDRequest) (*pb.GetUserByTgIDResponse, error) {
+	user, err := c.app.GetUserByTgID(ctx, req.GetTgId())
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, e.New(err)
 	}
 
 	res := &pb.GetUserByTgIDResponse{
@@ -93,10 +98,10 @@ func (s *Controller) GetUserByTgID(ctx context.Context, req *pb.GetUserByTgIDReq
 	return res, nil
 }
 
-func (s *Controller) UpdateUserByID(ctx context.Context, req *pb.UpdateUserByIDRequest) (*pb.UpdateUserByIDResponse, error) {
+func (c *Controller) UpdateUserByID(ctx context.Context, req *pb.UpdateUserByIDRequest) (*pb.UpdateUserByIDResponse, error) {
 	uid, err := uuid.Parse(req.GetId())
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, msgInvalidUUID)
 	}
 
 	upd := &models.UserUpdate{
@@ -104,55 +109,55 @@ func (s *Controller) UpdateUserByID(ctx context.Context, req *pb.UpdateUserByIDR
 		Language:   req.GetUpdate().GetLang(),
 	}
 
-	err = s.app.UpdateUserByID(ctx, uid, upd)
+	err = c.app.UpdateUserByID(ctx, uid, upd)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, e.New(err)
 	}
 
 	return &pb.UpdateUserByIDResponse{}, nil
 }
 
-func (s *Controller) UpdateUserByTgID(ctx context.Context, req *pb.UpdateUserByTgIDRequest) (*pb.UpdateUserByTgIDResponse, error) {
+func (c *Controller) UpdateUserByTgID(ctx context.Context, req *pb.UpdateUserByTgIDRequest) (*pb.UpdateUserByTgIDResponse, error) {
 	upd := &models.UserUpdate{
 		TgUsername: req.GetUpdate().GetTgUsername(),
 		Language:   req.GetUpdate().GetLang(),
 	}
 
-	err := s.app.UpdateUserByTgID(ctx, req.GetTgId(), upd)
+	err := c.app.UpdateUserByTgID(ctx, req.GetTgId(), upd)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, e.New(err)
 	}
 
 	return &pb.UpdateUserByTgIDResponse{}, nil
 }
 
-func (s *Controller) DeleteUserByID(ctx context.Context, req *pb.DeleteUserByIDRequest) (*pb.DeleteUserByIDResponse, error) {
+func (c *Controller) DeleteUserByID(ctx context.Context, req *pb.DeleteUserByIDRequest) (*pb.DeleteUserByIDResponse, error) {
 	uid, err := uuid.Parse(req.GetId())
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, msgInvalidUUID)
 	}
 
-	err = s.app.DeleteUserByID(ctx, uid)
+	err = c.app.DeleteUserByID(ctx, uid)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, e.New(err)
 	}
 
 	return &pb.DeleteUserByIDResponse{}, nil
 }
 
-func (s *Controller) DeleteUserByTgID(ctx context.Context, req *pb.DeleteUserByTgIDRequest) (*pb.DeleteUserByTgIDResponse, error) {
-	err := s.app.DeleteUserByTgID(ctx, req.GetTgId())
+func (c *Controller) DeleteUserByTgID(ctx context.Context, req *pb.DeleteUserByTgIDRequest) (*pb.DeleteUserByTgIDResponse, error) {
+	err := c.app.DeleteUserByTgID(ctx, req.GetTgId())
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, e.New(err)
 	}
 
 	return &pb.DeleteUserByTgIDResponse{}, nil
 }
 
-func (s *Controller) GetUserID(ctx context.Context, req *pb.GetUserIDRequest) (*pb.GetUserIDResponse, error) {
-	id, err := s.app.GetUserID(ctx, req.GetTgId())
+func (c *Controller) GetUserID(ctx context.Context, req *pb.GetUserIDRequest) (*pb.GetUserIDResponse, error) {
+	id, err := c.app.GetUserID(ctx, req.GetTgId())
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, e.New(err)
 	}
 
 	res := &pb.GetUserIDResponse{
@@ -162,15 +167,15 @@ func (s *Controller) GetUserID(ctx context.Context, req *pb.GetUserIDRequest) (*
 	return res, nil
 }
 
-func (s *Controller) GetUserTgID(ctx context.Context, req *pb.GetUserTgIDRequest) (*pb.GetUserTgIDResponse, error) {
+func (c *Controller) GetUserTgID(ctx context.Context, req *pb.GetUserTgIDRequest) (*pb.GetUserTgIDResponse, error) {
 	uid, err := uuid.Parse(req.GetId())
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, msgInvalidUUID)
 	}
 
-	id, err := s.app.GetUserTgID(ctx, uid)
+	id, err := c.app.GetUserTgID(ctx, uid)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, e.New(err)
 	}
 
 	res := &pb.GetUserTgIDResponse{
@@ -180,26 +185,26 @@ func (s *Controller) GetUserTgID(ctx context.Context, req *pb.GetUserTgIDRequest
 	return res, nil
 }
 
-func (s *Controller) Run() {
+func (c *Controller) Run() {
 	go func() {
-		addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
-		s.log.Info(
+		addr := fmt.Sprintf("%s:%d", c.cfg.Host, c.cfg.Port)
+		c.log.Info(
 			"starting gRPC server",
-			zap.String("host", s.cfg.Host),
-			zap.Int("port", s.cfg.Port),
+			zap.String("host", c.cfg.Host),
+			zap.Int("port", c.cfg.Port),
 		)
 		l, err := net.Listen("tcp", addr)
 		if err != nil {
-			s.log.Fatal("failed to listen", zap.Error(err))
+			c.log.Fatal("failed to listen", zap.Error(err))
 		}
 
-		err = s.server.Serve(l)
+		err = c.server.Serve(l)
 		if err != nil {
-			s.log.Fatal("failed to listen", zap.Error(err))
+			c.log.Fatal("failed to listen", zap.Error(err))
 		}
 	}()
 }
 
-func (s *Controller) Shutdown() {
-	s.server.GracefulStop()
+func (c *Controller) Shutdown() {
+	c.server.GracefulStop()
 }

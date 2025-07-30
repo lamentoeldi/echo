@@ -3,10 +3,14 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/echo/tgdb/internal/domain/models"
+	e "github.com/echo/tgdb/pkg/errors"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -18,12 +22,28 @@ const (
 	errPatternGetUserID  = "failed to get user id: %w"
 )
 
+func resolveErr(err error) error {
+	if errors.Is(err, pgx.ErrNoRows) {
+		return fmt.Errorf("%w: %w", e.ErrNotFound, err)
+	}
+
+	var pgxErr *pgconn.PgError
+	if errors.As(err, &pgxErr) {
+		switch pgxErr.Code {
+		case "23505":
+			return fmt.Errorf("%w: %w", e.ErrConflict, err)
+		}
+	}
+
+	return err
+}
+
 type PgUserRepo struct {
 	pool *pgxpool.Pool
 }
 
-func NewUserRepo(pool *pgxpool.Pool) (*PgUserRepo, error) {
-	return &PgUserRepo{pool: pool}, nil
+func NewUserRepo(pool *pgxpool.Pool) *PgUserRepo {
+	return &PgUserRepo{pool: pool}
 }
 
 func (p *PgUserRepo) Add(ctx context.Context, user *models.User) error {
@@ -34,12 +54,12 @@ func (p *PgUserRepo) Add(ctx context.Context, user *models.User) error {
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return fmt.Errorf(errPatternAddUser, err)
+		return fmt.Errorf(errPatternAddUser, resolveErr(err))
 	}
 
 	_, err = p.pool.Exec(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf(errPatternAddUser, err)
+		return fmt.Errorf(errPatternAddUser, resolveErr(err))
 	}
 
 	return nil
@@ -53,7 +73,7 @@ func (p *PgUserRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.User, e
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return nil, fmt.Errorf(errPatternGetUser, err)
+		return nil, fmt.Errorf(errPatternGetUser, resolveErr(err))
 	}
 
 	username := sql.NullString{}
@@ -65,7 +85,7 @@ func (p *PgUserRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.User, e
 		QueryRow(ctx, query, args...).
 		Scan(&user.TgID, &username, &user.Language, &user.CreatedAt)
 	if err != nil {
-		return nil, fmt.Errorf(errPatternGetUser, err)
+		return nil, fmt.Errorf(errPatternGetUser, resolveErr(err))
 	}
 
 	if username.Valid {
@@ -83,7 +103,7 @@ func (p *PgUserRepo) GetByTgID(ctx context.Context, id int64) (*models.User, err
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return nil, fmt.Errorf(errPatternGetUser, err)
+		return nil, fmt.Errorf(errPatternGetUser, resolveErr(err))
 	}
 
 	username := sql.NullString{}
@@ -95,7 +115,7 @@ func (p *PgUserRepo) GetByTgID(ctx context.Context, id int64) (*models.User, err
 		QueryRow(ctx, query, args...).
 		Scan(&user.ID, &username, &user.Language, &user.CreatedAt)
 	if err != nil {
-		return nil, fmt.Errorf(errPatternGetUser, err)
+		return nil, fmt.Errorf(errPatternGetUser, resolveErr(err))
 	}
 
 	if username.Valid {
@@ -121,12 +141,16 @@ func (p *PgUserRepo) UpdateByID(ctx context.Context, id uuid.UUID, user *models.
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return fmt.Errorf(errPatternUpdateUser, err)
+		return fmt.Errorf(errPatternUpdateUser, resolveErr(err))
 	}
 
-	_, err = p.pool.Exec(ctx, query, args...)
+	cmd, err := p.pool.Exec(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf(errPatternUpdateUser, err)
+		return fmt.Errorf(errPatternUpdateUser, resolveErr(err))
+	}
+
+	if cmd.RowsAffected() != 1 {
+		return fmt.Errorf(errPatternUpdateUser, e.ErrNotFound)
 	}
 
 	return nil
@@ -148,12 +172,16 @@ func (p *PgUserRepo) UpdateByTgID(ctx context.Context, id int64, user *models.Us
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return fmt.Errorf(errPatternUpdateUser, err)
+		return fmt.Errorf(errPatternUpdateUser, resolveErr(err))
 	}
 
-	_, err = p.pool.Exec(ctx, query, args...)
+	cmd, err := p.pool.Exec(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf(errPatternUpdateUser, err)
+		return fmt.Errorf(errPatternUpdateUser, resolveErr(err))
+	}
+
+	if cmd.RowsAffected() != 1 {
+		return fmt.Errorf(errPatternUpdateUser, e.ErrNotFound)
 	}
 
 	return nil
@@ -166,12 +194,16 @@ func (p *PgUserRepo) DeleteByID(ctx context.Context, id uuid.UUID) error {
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return fmt.Errorf(errPatternDeleteUser, err)
+		return fmt.Errorf(errPatternDeleteUser, resolveErr(err))
 	}
 
-	_, err = p.pool.Exec(ctx, query, args...)
+	cmd, err := p.pool.Exec(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf(errPatternDeleteUser, err)
+		return fmt.Errorf(errPatternDeleteUser, resolveErr(err))
+	}
+
+	if cmd.RowsAffected() != 1 {
+		return fmt.Errorf(errPatternUpdateUser, e.ErrNotFound)
 	}
 
 	return nil
@@ -184,12 +216,16 @@ func (p *PgUserRepo) DeleteByTgID(ctx context.Context, id int64) error {
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return fmt.Errorf(errPatternDeleteUser, err)
+		return fmt.Errorf(errPatternDeleteUser, resolveErr(err))
 	}
 
-	_, err = p.pool.Exec(ctx, query, args...)
+	cmd, err := p.pool.Exec(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf(errPatternDeleteUser, err)
+		return fmt.Errorf(errPatternDeleteUser, resolveErr(err))
+	}
+
+	if cmd.RowsAffected() != 1 {
+		return fmt.Errorf(errPatternUpdateUser, e.ErrNotFound)
 	}
 
 	return nil
@@ -203,7 +239,7 @@ func (p *PgUserRepo) GetID(ctx context.Context, id int64) (uuid.UUID, error) {
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return uuid.Nil, fmt.Errorf(errPatternGetUserID, err)
+		return uuid.Nil, fmt.Errorf(errPatternGetUserID, resolveErr(err))
 	}
 
 	uid := uuid.UUID{}
@@ -211,7 +247,7 @@ func (p *PgUserRepo) GetID(ctx context.Context, id int64) (uuid.UUID, error) {
 		QueryRow(ctx, query, args...).
 		Scan(&uid)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf(errPatternGetUserID, err)
+		return uuid.Nil, fmt.Errorf(errPatternGetUserID, resolveErr(err))
 	}
 
 	return uid, nil
@@ -225,7 +261,7 @@ func (p *PgUserRepo) GetTgID(ctx context.Context, id uuid.UUID) (int64, error) {
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return 0, fmt.Errorf(errPatternGetUserID, err)
+		return 0, fmt.Errorf(errPatternGetUserID, resolveErr(err))
 	}
 
 	tgID := int64(0)
@@ -233,7 +269,7 @@ func (p *PgUserRepo) GetTgID(ctx context.Context, id uuid.UUID) (int64, error) {
 		QueryRow(ctx, query, args...).
 		Scan(&tgID)
 	if err != nil {
-		return 0, fmt.Errorf(errPatternGetUserID, err)
+		return 0, fmt.Errorf(errPatternGetUserID, resolveErr(err))
 	}
 
 	return tgID, nil
