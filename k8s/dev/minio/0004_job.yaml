@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-buckets
+  namespace: dev
+spec:
+  template:
+    spec:
+      containers:
+        - name: bucket-init
+          image: minio/mc
+          imagePullPolicy: Always
+          env:
+            - name: ACCESS_KEY_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: s3-config
+                  key: MINIO_ROOT_USER
+            - name: ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: s3-config
+                  key: MINIO_ROOT_PASSWORD
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "Waiting for MinIO..."
+              until mc alias set local http://s3-0.s3:9000 $ACCESS_KEY_ID $ACCESS_KEY; do
+                sleep 2
+              done
+              echo "Creating bucket..."
+              mc mb --ignore-existing local/audio-raw
+              mc mb --ignore-existing local/audio-preprocessed
+              echo "Done."
+      restartPolicy: OnFailure

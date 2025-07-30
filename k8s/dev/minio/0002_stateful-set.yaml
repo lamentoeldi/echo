@@ -26,26 +26,29 @@ spec:
             - /data
           ports:
             - containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: s3-config
           volumeMounts:
             - name: s3-data
               mountPath: /data
           startupProbe:
             exec:
-              command: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+              command: [ "curl", "-f", "http://localhost:9000/minio/health/live" ]
             initialDelaySeconds: 15
             timeoutSeconds: 5
             periodSeconds: 10
             failureThreshold: 5
           livenessProbe:
             exec:
-              command: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+              command: [ "curl", "-f", "http://localhost:9000/minio/health/live" ]
             initialDelaySeconds: 15
             timeoutSeconds: 5
             periodSeconds: 5
             failureThreshold: 3
           readinessProbe:
             exec:
-              command: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+              command: [ "curl", "-f", "http://localhost:9000/minio/health/live" ]
             initialDelaySeconds: 15
             timeoutSeconds: 5
             periodSeconds: 5
