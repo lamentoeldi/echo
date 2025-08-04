@@ -41,6 +41,7 @@ class MetricsServer:
         self.cfg = cfg
         self.log = log
 
+        self.app.router.add_get("/health", self.handle_healthcheck)
         self.app.router.add_get("/metrics", self.handle_metrics)
 
     def _mw_error_handler(self):
@@ -52,6 +53,10 @@ class MetricsServer:
                 self.log.error(str(err))
                 return Response(status=500)
         return mw
+
+    @staticmethod
+    async def handle_healthcheck(_: Request) -> StreamResponse:
+        return Response(status=200)
 
     @staticmethod
     async def handle_metrics(_: Request) -> StreamResponse:

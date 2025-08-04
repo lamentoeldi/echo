@@ -13,8 +13,10 @@ from src.infrastructure import (
 from src.infrastructure.log import setup_logger
 from src.application import TranscribeAudioUseCase
 
+from structlog.stdlib import BoundLogger
 
-async def main():
+
+async def startup(log: BoundLogger):
     core = Core()
 
     kafka_producer_cfg = KafkaConfig()
@@ -25,8 +27,6 @@ async def main():
 
     whisper_cfg = WhisperConfig()
     whisper = WhisperAudioTranscriberAdapter(whisper_cfg)
-
-    log = setup_logger()
 
     metrics_cfg = MetricsServerConfig()
     metrics = MetricsServer(log=log, cfg=metrics_cfg)
@@ -59,6 +59,17 @@ async def main():
         kafka_consumer.run(),
         stopper.run(),
     )
+
+async def main():
+    log = setup_logger()
+
+    try:
+        await startup(log)
+    except Exception as err:
+        log.critical(
+            "startup error",
+            error=err,
+        )
 
 
 if __name__ == '__main__':

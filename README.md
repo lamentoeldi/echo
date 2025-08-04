@@ -43,6 +43,15 @@ Version: `0.1.2`
 - Kafka
 - S3
 
+### Endpoints
+
+#### GET /metrics
+Prometheus metrics endpoint
+
+##### Responses
+
+> `200`: Returns prometheus format metrics
+
 ### Configuration
 `S3_ACCESS_KEY_ID`: S3 Access Key ID (example: `moonfire`)
 
@@ -81,6 +90,15 @@ This service:
 ### Dependencies
 - Postgres
 - Redis
+
+### Endpoints
+
+#### GET /metrics
+Prometheus metrics endpoint
+
+##### Responses
+
+> `200`: Returns prometheus format metrics
 
 ### Configuration
 `APP_NAME`: Application name (default: `tgdb`)
@@ -150,6 +168,15 @@ Version: `0.1.0`
 - sox
 - ffmpeg
 
+### Endpoints
+
+#### GET /metrics
+Prometheus metrics endpoint
+
+##### Responses
+
+> `200`: Returns prometheus format metrics
+
 ### Configuration
 `S3_ACCESS_KEY_ID`: S3 Access Key ID (example: `moonfire`)
 
@@ -181,6 +208,22 @@ Version: `0.1.1`
 - S3
 - ffmpeg
 - OpenAI Whisper
+
+### Endpoints
+
+#### GET /healthcheck
+Healthcheck endpoint
+
+##### Responses
+
+> `200`: Ok
+
+#### GET /metrics
+Prometheus metrics endpoint
+
+##### Responses
+
+> `200`: Returns prometheus format metrics
 
 ### Configuration
 `S3_ACCESS_KEY_ID`: S3 Access Key ID (example: `moonfire`)
