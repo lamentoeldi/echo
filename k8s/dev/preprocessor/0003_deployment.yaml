@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ap-deploy
+  namespace: dev
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ap
+  template:
+    metadata:
+      namespace: dev
+      labels:
+        app: ap
+    spec:
+      containers:
+        - name: ap
+          image: registry.gitlab.com/echo-public/echo/preprocessor:0.1.1
+          imagePullPolicy: Always
+          ports:
+            - name: ops
+              containerPort: 9090
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: ap-config
+            - secretRef:
+                name: ap-secret
+          resources:
+            requests:
+              cpu: 400m
+              memory: 512Mi
+            limits:
+              cpu: 800m
+              memory: 1024Mi
+      imagePullSecrets:
+        - name: gitlab-registry

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: transcriber-config
+  namespace: dev
+
+data:
+  MODEL: "medium"
+  KAFKA_BOOTSTRAP_SERVERS: '["kafka-0.kafka:9092"]'
+  KAFKA_CONSUMER_GROUP: "transcriber-medium"
+  S3_URL: "http://s3-0.s3:9000"
+  LOG_LEVEL: "debug"
