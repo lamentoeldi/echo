@@ -1,6 +1,6 @@
 from logging import (
     getLogger,
-    INFO, CRITICAL,
+    INFO, CRITICAL, DEBUG, ERROR, WARN,
     StreamHandler,
     Formatter,
     root
@@ -8,7 +8,28 @@ from logging import (
 import sys
 
 import structlog
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
+class LogConfig(BaseSettings):
+    log_name: str = Field("name")
+    log_level: str  = Field("info")
+    disable_other_loggers: bool = Field(True)
+
+    def get_log_level(self) -> int:
+        match self.log_level:
+            case "debug":
+                return DEBUG
+            case "info":
+                return INFO
+            case "warning":
+                return WARN
+            case "error":
+                return ERROR
+            case "fatal":
+                return CRITICAL
+            case _:
+                raise ValueError("invalid log level specified")
 
 def setup_logger(
     name: str = "main",

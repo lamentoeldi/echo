@@ -85,7 +85,11 @@ class KafkaController:
             async for msg in self.client:
                 kafka_consumed.inc()
                 start = time()
-                await self._handle_message(msg)
+                try:
+                    await self._handle_message(msg)
+                except Exception as err:
+                    self.log.error("error handling message", error=err)
+                    continue
                 end = time() - start
                 kafka_latency.observe(end)
 
@@ -94,7 +98,8 @@ class KafkaController:
                     .client
                     .commit()
                 )
-
+        except Exception as err:
+            self.log.critical("kafka consumer error", error=err)
         finally:
             await (
                 self

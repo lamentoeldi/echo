@@ -10,7 +10,7 @@ from src.infrastructure import (
     MetricsServerConfig, MetricsServer,
     GracefulStopper
 )
-from src.infrastructure.log import setup_logger
+from src.infrastructure.log import setup_logger, LogConfig
 from src.application import TranscribeAudioUseCase
 
 from structlog.stdlib import BoundLogger
@@ -20,13 +20,22 @@ async def startup(log: BoundLogger):
     core = Core()
 
     kafka_producer_cfg = KafkaConfig()
-    kafka_producer = KafkaMessageBus(kafka_producer_cfg)
+    kafka_producer = KafkaMessageBus(
+        cfg=kafka_producer_cfg,
+        log=log,
+    )
 
     s3_cfg = S3Config()
-    s3 = S3StoragePort(s3_cfg)
+    s3 = S3StoragePort(
+        config=s3_cfg,
+        log=log,
+    )
 
     whisper_cfg = WhisperConfig()
-    whisper = WhisperAudioTranscriberAdapter(whisper_cfg)
+    whisper = WhisperAudioTranscriberAdapter(
+        cfg=whisper_cfg,
+        log=log,
+    )
 
     metrics_cfg = MetricsServerConfig()
     metrics = MetricsServer(log=log, cfg=metrics_cfg)
@@ -61,7 +70,11 @@ async def startup(log: BoundLogger):
     )
 
 async def main():
-    log = setup_logger()
+    log_cfg = LogConfig()
+    log = setup_logger(
+        name=log_cfg.log_name,
+        level=log_cfg.get_log_level(),
+    )
 
     try:
         await startup(log)

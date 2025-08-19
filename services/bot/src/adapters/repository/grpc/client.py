@@ -3,7 +3,7 @@ from uuid import UUID
 
 from domain.models import UserUpdate, User
 from domain.ports.output import RepositoryPort
-from domain.expections import AlreadyExists, NotFound, InvalidArgument
+from domain.exceptions import AlreadyExists, NotFound, InvalidArgument
 from . import tgdb_pb2 as pb
 from . import tgdb_pb2_grpc as pb2
 
@@ -12,6 +12,7 @@ from grpc import StatusCode
 from grpc.aio import AioRpcError
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from structlog.stdlib import BoundLogger
 
 
 class TgDBRepoConfig(BaseSettings):
@@ -20,9 +21,10 @@ class TgDBRepoConfig(BaseSettings):
 
 
 class TgDBRepo(RepositoryPort):
-    def __init__(self, channel: grpc.aio.Channel):
+    def __init__(self, channel: grpc.aio.Channel, log: BoundLogger):
         self._channel = channel
         self._stub = pb2.TgDBStub(self._channel)
+        self._log = log
 
     async def add_user(self, user: User):
         req = pb.CreateUserRequest(
@@ -34,12 +36,16 @@ class TgDBRepo(RepositoryPort):
             )
         )
 
+        self._log.debug("adding user", user_id=user.id)
+
         try:
             await self._stub.CreateUser(req)
         except AioRpcError as err:
             if err.code() == StatusCode.ALREADY_EXISTS:
                 raise AlreadyExists(str(err))
             raise
+
+        self._log.debug("user added", user_id=user.id)
 
     @overload
     async def get_user(self, tg_id: int) -> User:
@@ -84,6 +90,8 @@ class TgDBRepo(RepositoryPort):
         )
 
     async def get_user(self, key: Union[int, UUID]) -> User:
+        self._log.debug("retrieving user", user_id=key)
+
         try:
             if isinstance(key, int):
                 return await self._get_user_by_tg_id(key)
@@ -139,6 +147,8 @@ class TgDBRepo(RepositoryPort):
         await self._stub.UpdateUserByID(req)
 
     async def update_user(self, key: Union[int, UUID], update: UserUpdate):
+        self._log.debug("updating user", user_id=key)
+
         try:
             if isinstance(key, int):
                 return await self._update_user_by_tg_id(key, update)
@@ -152,6 +162,8 @@ class TgDBRepo(RepositoryPort):
             raise
 
     async def delete_user(self, tg_id: int):
+        self._log.debug("deleting user", user_id=tg_id)
+
         req = pb.DeleteUserByTgIDRequest(tg_id=tg_id)
 
         try:
@@ -190,6 +202,8 @@ class TgDBRepo(RepositoryPort):
         return res.tg_id
 
     async def get_user_id(self, key: Union[int, UUID]) -> Union[UUID, int]:
+        self._log.debug("retrieving user id", user_id=key)
+
         try:
             if isinstance(key, int):
                 return await self._get_user_id_by_tg_id(key)

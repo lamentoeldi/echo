@@ -4,6 +4,7 @@ from typing import Optional
 from aioboto3 import Session
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from structlog.stdlib import BoundLogger
 
 from src.domain.ports.output import StoragePort
 
@@ -21,8 +22,9 @@ class S3StoragePort(StoragePort):
     config: S3Config
     input_bucket: str = "audio-preprocessed"
 
-    def __init__(self, config: S3Config):
+    def __init__(self, config: S3Config, log: BoundLogger):
         self.config = config
+        self._log = log
 
     async def download_audio(self, filename: str) -> BytesIO:
         stream = BytesIO()
@@ -34,8 +36,12 @@ class S3StoragePort(StoragePort):
             region_name=self.config.s3_region,
         )
 
+        self._log.debug("downloading audio", key=filename)
+
         async with sess.client("s3", endpoint_url=self.config.s3_url) as s3:
             await s3.download_fileobj(self.input_bucket, filename, stream)
+
+        self._log.debug("audio downloaded")
 
         stream.seek(0)
         return stream
@@ -48,5 +54,9 @@ class S3StoragePort(StoragePort):
             region_name=self.config.s3_region,
         )
 
+        self._log.debug("deleting audio", key=filename)
+
         async with sess.client("s3", endpoint_url=self.config.s3_url) as s3:
             await s3.delete_object(Bucket=self.input_bucket, Key=filename)
+
+        self._log.debug("audio deleted", key=filename)
