@@ -28,7 +28,7 @@ This projects implements MSA and consists of the following services
 
 ## Telegram Bot Frontend
 Status: `implemented`<br/>
-Version: `0.1.2`
+Version: `0.1.3`
 
 ### This service:
 - Manages telegram user accounts

@@ -11,6 +11,6 @@ data:
   TGDB_PORT: "50051"
   KAFKA_BOOTSTRAP_SERVERS: '["kafka-0.kafka:9092"]'
   KAFKA_CONSUMER_GROUP: "tg_bot"
-  BOT_API_MODE: "long_polling"
+  BOT_API_MODE: "webhook"
   DEFAULT_LOCALE: "en"
   LOG_LEVEL: "debug"
