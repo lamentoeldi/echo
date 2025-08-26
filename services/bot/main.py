@@ -11,8 +11,8 @@ from src.adapters.botapi.aiogram import (
 from src.adapters.bus.kafka import (
     KafkaConfig, KafkaMessageBus
 )
-from src.adapters.repository.grpc import (
-    TgDBRepoConfig, TgDBRepo
+from src.adapters.repository.postgres import (
+    PostgresConfig, PostgresRepo
 )
 from src.adapters.keyboards import KeyboardProvider
 from src.adapters.locale import JSONLocaleProvider
@@ -36,7 +36,6 @@ from src.infrastructure.log import setup_logger, LogConfig
 from src.infrastructure.redis_client import RedisConfig, setup_client
 
 from aiogram.fsm.storage.redis import RedisStorage
-from grpc.aio import insecure_channel
 
 
 async def main():
@@ -53,12 +52,8 @@ async def main():
     locale = JSONLocaleProvider("src/locales")
     keyboards = KeyboardProvider("src/keyboards/keyboards.json")
 
-    tgdb_cfg = TgDBRepoConfig()
-    ch = insecure_channel(f"{tgdb_cfg.tgdb_host}:{tgdb_cfg.tgdb_port}")
-    tgdb_repo = TgDBRepo(
-        channel=ch,
-        log=log,
-    )
+    pg_cfg = PostgresConfig()
+    pg_repo = PostgresRepo(config=pg_cfg)
 
     aiogram_bot_api_cfg = AiogramBotAPIConfig()
     bot = AiogramBotAPI(
@@ -82,19 +77,19 @@ async def main():
         config=bot_cfg,
         core=core,
         locale=locale,
-        repo=tgdb_repo,
+        repo=pg_repo,
         bot=bot,
     )
 
     uc_help = HelpUseCase(
-        repo=tgdb_repo,
+        repo=pg_repo,
         locale=locale,
         bot=bot,
     )
 
     uc_settings = SettingsUseCase(
         core=core,
-        repo=tgdb_repo,
+        repo=pg_repo,
         bot=bot,
         locale=locale,
         kb=keyboards,
@@ -102,13 +97,13 @@ async def main():
 
     uc_fallback = InvalidInputUseCase(
         locale=locale,
-        repo=tgdb_repo,
+        repo=pg_repo,
         bot=bot,
     )
 
     uc_vm = VoiceMessageUseCase(
         core=core,
-        repo=tgdb_repo,
+        repo=pg_repo,
         bot=bot,
         locale=locale,
         storage=s3,
@@ -116,13 +111,13 @@ async def main():
     )
 
     uc_error = ErrorResponseUseCase(
-        repo=tgdb_repo,
+        repo=pg_repo,
         locale=locale,
         bot=bot,
     )
 
     uc_block = UserBlockedBotUseCase(
-        repo=tgdb_repo,
+        repo=pg_repo,
     )
 
     redis_cfg = RedisConfig()

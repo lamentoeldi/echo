@@ -1,8 +1,6 @@
 from typing import Union, overload
 from uuid import UUID
 
-from pydantic import Field, computed_field
-from pydantic_settings import BaseSettings
 from sqlalchemy import create_engine
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, async_sessionmaker
@@ -12,29 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from domain.models import User, UserUpdate
 from domain.ports.output import RepositoryPort
 from infrastructure.db.schema import Base, Users
-
-
-class PostgresConfig(BaseSettings):
-    pg_host: str = Field()
-    pg_port: int = Field()
-    pg_user: str = Field()
-    pg_password: str = Field()
-    pg_db: str = Field()
-
-    @computed_field
-    @property
-    def dsn(self) -> str:
-        return f"postgres://{self.pg_user}:{self.pg_password}@{self.pg_host}:{self.pg_port}/{self.pg_db}"
-
-    @computed_field
-    @property
-    def orm_async_dsn(self) -> str:
-        return f"postgresql+asyncpg://{self.pg_user}:{self.pg_password}@{self.pg_host}:{self.pg_port}/{self.pg_db}"
-
-    @computed_field
-    @property
-    def orm_sync_dsn(self) -> str:
-        return f"postgresql://{self.pg_user}:{self.pg_password}@{self.pg_host}:{self.pg_port}/{self.pg_db}"
+from infrastructure.pgconfig import PostgresConfig
 
 
 class PostgresORMRepository(RepositoryPort):
