@@ -1,6 +1,5 @@
 import asyncio
 from signal import SIGINT, SIGTERM
-from logging import DEBUG
 
 from src.adapters.controllers import (
     AiogramConfig, AiogramController,
@@ -34,8 +33,9 @@ from src.config import BotConfig
 from src.infrastructure.metrics import MetricsServerConfig, MetricsServer
 from src.infrastructure.graceful_stop import GracefulStopper
 from src.infrastructure.log import setup_logger, LogConfig
+from src.infrastructure.redis_client import RedisConfig, setup_client
 
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 from grpc.aio import insecure_channel
 
 
@@ -125,7 +125,11 @@ async def main():
         repo=tgdb_repo,
     )
 
-    fsm_storage = MemoryStorage()
+    redis_cfg = RedisConfig()
+    redis_client = setup_client(redis_cfg)
+    fsm_storage = RedisStorage(
+        redis=redis_client,  # should probably work, redis cluster client instead of standalone redis connection
+    )
 
     aiogram_cfg = AiogramConfig()
     aiogram_controller = AiogramController(
