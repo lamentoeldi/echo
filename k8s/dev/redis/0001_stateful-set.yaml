@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: redis
+  namespace: dev
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  serviceName: redis
+  template:
+    metadata:
+      namespace: dev
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:8.2-rc1-alpine
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data/redis
+          startupProbe:
+            exec:
+              command: [ "redis-cli", "ping" ]
+            initialDelaySeconds: 15
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: [ "redis-cli", "ping" ]
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command: [ "redis-cli", "ping" ]
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

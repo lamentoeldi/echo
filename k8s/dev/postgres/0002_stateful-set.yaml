@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: dev
+  labels:
+    app: postgres
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  serviceName: postgres
+  template:
+    metadata:
+      namespace: dev
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: db
+          image: postgres:17.5-alpine3.22
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: pg-config
+          ports:
+            - containerPort: 5432
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+          startupProbe:
+            exec:
+              command:
+                - pg_isready
+            initialDelaySeconds: 15
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: pgdata
+        namespace: dev
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi

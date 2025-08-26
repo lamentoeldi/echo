@@ -8,21 +8,31 @@ from src.application.usecases import PreprocessUseCase
 from src.domain.core import Core
 from src.infrastructure.metrics import MetricsServerConfig, MetricsServer
 from src.infrastructure.graceful_stop import GracefulStopper
-from src.infrastructure.log import setup_logger
+from src.infrastructure.log import setup_logger, LogConfig
 
 
 async def main():
     core = Core()
 
+    log_cfg = LogConfig()
+    log = setup_logger(
+        name=log_cfg.log_name,
+        level=log_cfg.get_log_level(),
+    )
+
     s3_cfg = S3Config()
-    s3 = S3StoragePort(s3_cfg)
+    s3 = S3StoragePort(
+        config=s3_cfg,
+        log=log,
+    )
 
     kafka_mb_cfg = KafkaConfig()
-    kafka_mb = KafkaMessageBus(kafka_mb_cfg)
+    kafka_mb = KafkaMessageBus(
+        cfg=kafka_mb_cfg,
+        log=log,
+    )
 
     uc = PreprocessUseCase(core, s3, kafka_mb)
-
-    log = setup_logger()
 
     metrics_cfg = MetricsServerConfig()
     metrics = MetricsServer(

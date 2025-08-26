@@ -13,6 +13,7 @@ from aiogram.types import (
 )
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from structlog.stdlib import BoundLogger
 
 
 class AiogramBotAPIConfig(BaseSettings):
@@ -23,12 +24,13 @@ class AiogramBotAPI(BotAPIPort):
     cfg: AiogramBotAPIConfig
     bot: Bot
 
-    def __init__(self, cfg: AiogramBotAPIConfig):
+    def __init__(self, cfg: AiogramBotAPIConfig, log: BoundLogger):
         self.cfg = cfg
         self.bot = Bot(token=self.cfg.bot_token)
+        self._log = log
 
-    @staticmethod
-    def _get_inline_kb(markup: KeyboardMarkup) -> InlineKeyboardMarkup:
+    def _get_inline_kb(self, markup: KeyboardMarkup) -> InlineKeyboardMarkup:
+        self._log.debug("making inline keyboard")
         return InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -42,8 +44,8 @@ class AiogramBotAPI(BotAPIPort):
             ]
         )
 
-    @staticmethod
-    def _get_reply_kb(markup: KeyboardMarkup) -> ReplyKeyboardMarkup:
+    def _get_reply_kb(self, markup: KeyboardMarkup) -> ReplyKeyboardMarkup:
+        self._log.debug("making reply keyboard")
         return ReplyKeyboardMarkup(
             keyboard=[
                 [
@@ -55,12 +57,12 @@ class AiogramBotAPI(BotAPIPort):
             resize_keyboard=True
         )
 
-    @staticmethod
-    def _get_keyboard(kb: KeyboardMarkup) -> Union[InlineKeyboardMarkup, ReplyKeyboardMarkup]:
+    def _get_keyboard(self, kb: KeyboardMarkup) -> Union[InlineKeyboardMarkup, ReplyKeyboardMarkup]:
+        self._log.debug("getting keyboard")
         if kb.type == "inline":
-            return AiogramBotAPI._get_inline_kb(kb)
+            return self._get_inline_kb(kb)
         elif kb.type == "reply":
-            return AiogramBotAPI._get_reply_kb(kb)
+            return self._get_reply_kb(kb)
         else:
             raise ValueError(f"Unknown keyboard type: {kb.type}")
 
@@ -76,6 +78,8 @@ class AiogramBotAPI(BotAPIPort):
         if isinstance(keyboard, RemoveReplyKeyboard):
             kb = ReplyKeyboardRemove()
 
+        self._log.debug("sending tg message", user_id=user_id)
+
         await (
             self
             .bot
@@ -85,3 +89,5 @@ class AiogramBotAPI(BotAPIPort):
                 reply_markup=kb
             )
         )
+
+        self._log.debug("message sent", user_id=user_id)

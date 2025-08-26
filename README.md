@@ -28,7 +28,7 @@ This projects implements MSA and consists of the following services
 
 ## Telegram Bot Frontend
 Status: `implemented`<br/>
-Version: `0.1.2`
+Version: `0.1.3`
 
 ### This service:
 - Manages telegram user accounts
@@ -42,6 +42,18 @@ Version: `0.1.2`
 - PostgreSQL
 - Kafka
 - S3
+
+### Endpoints
+
+#### POST /webhook
+Telegram Bot API webhook (webhook mode only)
+
+#### GET /metrics
+Prometheus metrics endpoint
+
+##### Responses
+
+> `200`: Returns prometheus format metrics
 
 ### Configuration
 `S3_ACCESS_KEY_ID`: S3 Access Key ID (example: `moonfire`)
@@ -70,9 +82,11 @@ Version: `0.1.2`
 
 `METRICS_PORT`: Port to server Prometheus metrics on (default: `9090`, example: `9090`)
 
+`LOG_LEVEL`: Logging level (`debug`, `info`, `warning`, `error`, `fatal`, default: `info`)
+
 ## tgdb
 Status: `implemented`<br/>
-Version: `0.1.2`
+Version: `0.1.3`
 
 This service:
 - Manages tg bot db and cache
@@ -81,6 +95,15 @@ This service:
 ### Dependencies
 - Postgres
 - Redis
+
+### Endpoints
+
+#### GET /metrics
+Prometheus metrics endpoint
+
+##### Responses
+
+> `200`: Returns prometheus format metrics
 
 ### Configuration
 `APP_NAME`: Application name (default: `tgdb`)
@@ -121,7 +144,7 @@ This service:
 
 `REDIS_BULK_MAX_SIZE`: Redis del bulk max size (default: `100`)
 
-`METRICS_HOST`: Prometheus metrics host (default: `host`)
+`METRICS_HOST`: Prometheus metrics host (default: `0.0.0.0`)
 
 `METRICS_PORT`: Prometheus metrics port (default: `9090`)
 
@@ -129,9 +152,11 @@ This service:
 
 `TRACER_APP_NAME`: Tracer app name (default: `tgdb`)
 
+`LOG_LEVEL`: Logging level (`debug`, `info`, `warning`, `error`, `fatal`, default: `info`)
+
 ## Audio Preprocessor
 Status: `implemented`<br/>
-Version: `0.1.0`
+Version: `0.1.1`
 
 ### This service:
 - Consumes [audio_raw](api/async/api.yaml) messages from [audio_raw](api/async/api.yaml) topic
@@ -150,6 +175,15 @@ Version: `0.1.0`
 - sox
 - ffmpeg
 
+### Endpoints
+
+#### GET /metrics
+Prometheus metrics endpoint
+
+##### Responses
+
+> `200`: Returns prometheus format metrics
+
 ### Configuration
 `S3_ACCESS_KEY_ID`: S3 Access Key ID (example: `moonfire`)
 
@@ -165,9 +199,11 @@ Version: `0.1.0`
 
 `METRICS_PORT`: Port to server Prometheus metrics on (default: `9090`, example: `9090`)
 
+`LOG_LEVEL`: Logging level (`debug`, `info`, `warning`, `error`, `fatal`, default: `info`)
+
 ## Audio Transcriber
 Status: `implemented`<br/>
-Version: `0.1.1`
+Version: `0.1.3`
 
 ### This service:
 - Consumes [audio_preprocessed](api/async/api.yaml) messages from [audio_preprocessed](api/async/api.yaml) topic
@@ -182,6 +218,22 @@ Version: `0.1.1`
 - ffmpeg
 - OpenAI Whisper
 
+### Endpoints
+
+#### GET /health
+Healthcheck endpoint
+
+##### Responses
+
+> `200`: Ok
+
+#### GET /metrics
+Prometheus metrics endpoint
+
+##### Responses
+
+> `200`: Returns prometheus format metrics
+
 ### Configuration
 `S3_ACCESS_KEY_ID`: S3 Access Key ID (example: `moonfire`)
 
@@ -193,13 +245,15 @@ Version: `0.1.1`
 
 `KAFKA_CONSUMER_GROUP`: Kafka consumer group to join (example: `transcriber`)
 
-`WHISPER_MODEL`: Whisper model ["tiny", "base", "small", "medium", "large"] (default: `base`, example: `base`)
+`MODEL`: Whisper model ["tiny", "base", "small", "medium", "large"] (default: `base`, example: `base`)
 
 `WHISPER_MAX_WORKERS`: Maximum whisper calls executed in the same time (default: `1`, example: `1`)
 
 `METRICS_HOST`: Host to serve Prometheus metrics on (default: `0.0.0.0`, example: `0.0.0.0`)
 
 `METRICS_PORT`: Port to server Prometheus metrics on (default: `9090`, example: `9090`)
+
+`LOG_LEVEL`: Logging level (`debug`, `info`, `warning`, `error`, `fatal`, default: `info`)
 
 # Scripts
 In this section you may find description of '.sh' and 'Makefile' scripts

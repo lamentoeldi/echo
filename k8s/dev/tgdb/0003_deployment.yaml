@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tgdb-deploy
+  namespace: dev
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tgdb
+  template:
+    metadata:
+      namespace: dev
+      labels:
+        app: tgdb
+    spec:
+      containers:
+        - name: tgdb
+          image: registry.gitlab.com/echo-public/echo/tgdb:0.1.2
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+            - containerPort: 50051
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: tgdb-config
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: tgdb-secrets
+                  key: postgres_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tgdb-secrets
+                  key: postgres_password
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+      imagePullSecrets:
+        - name: gitlab-registry

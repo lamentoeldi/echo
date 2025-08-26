@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-config
+  namespace: dev
+data:
+  POSTGRES_USER: "dev"
+  POSTGRES_PASSWORD: "dev"
+  POSTGRES_DB: "dev"

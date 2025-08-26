@@ -4,6 +4,7 @@ from typing import Optional
 from aioboto3 import Session
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from structlog.stdlib import BoundLogger
 
 from domain.ports.output import StoragePort
 
@@ -21,8 +22,9 @@ class S3StoragePort(StoragePort):
     config: S3Config
     bucket: str = "audio-raw"
 
-    def __init__(self, config: S3Config):
+    def __init__(self, config: S3Config, log: BoundLogger):
         self.config = config
+        self._log = log
 
     async def upload_audio(self, filename: str, audio: BytesIO):
         audio.seek(0)
@@ -34,5 +36,9 @@ class S3StoragePort(StoragePort):
             region_name=self.config.s3_region,
         )
 
+        self._log.debug("uploading audio", key=filename)
+
         async with sess.client("s3", endpoint_url=self.config.s3_url) as s3:
             await s3.upload_fileobj(audio, self.bucket, filename)
+
+        self._log.debug("audio uploaded", key=filename)

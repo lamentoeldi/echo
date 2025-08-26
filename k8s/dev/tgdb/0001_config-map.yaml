@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: tgdb-config
+  namespace: dev
+
+data:
+  POSTGRES_HOST: "postgres-0.postgres"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "dev"
+  REDIS_HOST: "redis-0.redis"
+  REDIS_PORT: "6379"
+  TRACER_ENDPOINT: "jaeger-0.jaeger:4318"

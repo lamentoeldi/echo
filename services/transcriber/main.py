@@ -10,23 +10,32 @@ from src.infrastructure import (
     MetricsServerConfig, MetricsServer,
     GracefulStopper
 )
-from src.infrastructure.log import setup_logger
+from src.infrastructure.log import setup_logger, LogConfig
 from src.application import TranscribeAudioUseCase
 
+from structlog.stdlib import BoundLogger
 
-async def main():
+
+async def startup(log: BoundLogger):
     core = Core()
 
     kafka_producer_cfg = KafkaConfig()
-    kafka_producer = KafkaMessageBus(kafka_producer_cfg)
+    kafka_producer = KafkaMessageBus(
+        cfg=kafka_producer_cfg,
+        log=log,
+    )
 
     s3_cfg = S3Config()
-    s3 = S3StoragePort(s3_cfg)
+    s3 = S3StoragePort(
+        config=s3_cfg,
+        log=log,
+    )
 
     whisper_cfg = WhisperConfig()
-    whisper = WhisperAudioTranscriberAdapter(whisper_cfg)
-
-    log = setup_logger()
+    whisper = WhisperAudioTranscriberAdapter(
+        cfg=whisper_cfg,
+        log=log,
+    )
 
     metrics_cfg = MetricsServerConfig()
     metrics = MetricsServer(log=log, cfg=metrics_cfg)
@@ -59,6 +68,21 @@ async def main():
         kafka_consumer.run(),
         stopper.run(),
     )
+
+async def main():
+    log_cfg = LogConfig()
+    log = setup_logger(
+        name=log_cfg.log_name,
+        level=log_cfg.get_log_level(),
+    )
+
+    try:
+        await startup(log)
+    except Exception as err:
+        log.critical(
+            "startup error",
+            error=err,
+        )
 
 
 if __name__ == '__main__':

@@ -1,4 +1,7 @@
-.venv
+.venv/
 .idea
 .env
 Dockerfile
+*.pt 
+.cache/
+__pycache__/

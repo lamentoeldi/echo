@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: transcriber-medium-deploy
+  namespace: dev
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transcriber-medium
+  template:
+    metadata:
+      namespace: dev
+      labels:
+        app: transcriber-medium
+    spec:
+      nodeSelector:
+        gpu: "true"
+      containers:
+        - name: transcriber
+          image: registry.gitlab.com/echo-public/echo/transcriber:0.1.3
+          imagePullPolicy: Always
+          ports:
+            - name: ops
+              containerPort: 9090
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 4000m
+              memory: 4Gi
+            limits:
+              cpu: 8000m
+              memory: 8Gi
+          startupProbe:
+            httpGet:
+              port: 9090
+              path: /health
+            initialDelaySeconds: 600
+            failureThreshold: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              port: 9090
+              path: /health
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              port: 9090
+              path: /health
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 3
+          envFrom:
+            - configMapRef:
+                name: transcriber-config
+            - secretRef:
+                name: transcriber-secret
+      imagePullSecrets:
+        - name: gitlab-registry

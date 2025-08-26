@@ -33,7 +33,7 @@ from src.domain.core import Core
 from src.config import BotConfig
 from src.infrastructure.metrics import MetricsServerConfig, MetricsServer
 from src.infrastructure.graceful_stop import GracefulStopper
-from src.infrastructure.log import setup_logger
+from src.infrastructure.log import setup_logger, LogConfig
 
 from aiogram.fsm.storage.memory import MemoryStorage
 from grpc.aio import insecure_channel
@@ -42,6 +42,12 @@ from grpc.aio import insecure_channel
 async def main():
     core = Core()
 
+    log_cfg = LogConfig()
+    log = setup_logger(
+        name=log_cfg.log_name,
+        level=log_cfg.get_log_level(),
+    )
+
     bot_cfg = BotConfig()
 
     locale = JSONLocaleProvider("src/locales")
@@ -49,16 +55,28 @@ async def main():
 
     tgdb_cfg = TgDBRepoConfig()
     ch = insecure_channel(f"{tgdb_cfg.tgdb_host}:{tgdb_cfg.tgdb_port}")
-    tgdb_repo = TgDBRepo(ch)
+    tgdb_repo = TgDBRepo(
+        channel=ch,
+        log=log,
+    )
 
     aiogram_bot_api_cfg = AiogramBotAPIConfig()
-    bot = AiogramBotAPI(aiogram_bot_api_cfg)
+    bot = AiogramBotAPI(
+        cfg=aiogram_bot_api_cfg,
+        log=log,
+    )
 
     kafka_producer_cfg = KafkaConfig()
-    kafka_producer = KafkaMessageBus(kafka_producer_cfg)
+    kafka_producer = KafkaMessageBus(
+        cfg=kafka_producer_cfg,
+        log=log,
+    )
 
     s3_cfg = S3Config()
-    s3 = S3StoragePort(s3_cfg)
+    s3 = S3StoragePort(
+        config=s3_cfg,
+        log=log,
+    )
 
     uc_start = StartUseCase(
         config=bot_cfg,
@@ -108,8 +126,6 @@ async def main():
     )
 
     fsm_storage = MemoryStorage()
-
-    log = setup_logger(level=DEBUG)
 
     aiogram_cfg = AiogramConfig()
     aiogram_controller = AiogramController(
