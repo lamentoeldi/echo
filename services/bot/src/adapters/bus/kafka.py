@@ -11,6 +11,7 @@ from structlog.stdlib import BoundLogger
 
 class KafkaConfig(BaseSettings):
     kafka_bootstrap_servers: list[str] = Field()
+    kafka_output_topic: str = Field("audio_raw")
 
 
 class KafkaMessageBus(MessageBusPort):
@@ -27,7 +28,7 @@ class KafkaMessageBus(MessageBusPort):
             await (
                 producer
                 .send(
-                    topic="audio_raw",
+                    topic=self.cfg.kafka_output_topic,
                     value=md.model_dump_json(
                         exclude_none=True
                     )

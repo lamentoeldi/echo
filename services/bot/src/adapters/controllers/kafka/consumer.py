@@ -29,6 +29,7 @@ kafka_latency = Histogram(
 class KafkaConsumerConfig(BaseSettings):
     kafka_bootstrap_servers: list[str] = Field()
     kafka_consumer_group: str = Field()
+    kafka_input_topic: str = Field("audio_transcribed_tg")
 
 
 class KafkaController:
@@ -46,10 +47,8 @@ class KafkaController:
         self.log = log
         self.vm_uc = vm_uc
 
-        topic = "audio_transcribed_tg"
-
         self.client = AIOKafkaConsumer(
-            topic,
+            self.cfg.kafka_input_topic,
             bootstrap_servers=self.cfg.kafka_bootstrap_servers,
             group_id=self.cfg.kafka_consumer_group,
             enable_auto_commit=False,

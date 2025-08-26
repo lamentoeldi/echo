@@ -13,17 +13,15 @@ class S3Config(BaseSettings):
     s3_access_key_id: str = Field()
     s3_secret_access_key: str = Field()
     s3_url: str = Field()
+    s3_output_bucket: str = Field("audio-raw")
 
     s3_region: Optional[str] = Field(default="us-east-1")
     s3_session_key: Optional[str] = Field(default=None)
 
 
 class S3StoragePort(StoragePort):
-    config: S3Config
-    bucket: str = "audio-raw"
-
     def __init__(self, config: S3Config, log: BoundLogger):
-        self.config = config
+        self._cfg = config
         self._log = log
 
     async def upload_audio(self, filename: str, audio: BytesIO):
@@ -39,6 +37,6 @@ class S3StoragePort(StoragePort):
         self._log.debug("uploading audio", key=filename)
 
         async with sess.client("s3", endpoint_url=self.config.s3_url) as s3:
-            await s3.upload_fileobj(audio, self.bucket, filename)
+            await s3.upload_fileobj(audio, self._cfg.s3_output_bucket, filename)
 
         self._log.debug("audio uploaded", key=filename)
